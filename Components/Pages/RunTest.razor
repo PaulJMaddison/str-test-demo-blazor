@@ -46,32 +46,57 @@ else
 {
     var asset = DemoData.FindAsset(CurrentRun.AssetId);
     var template = DemoData.FindTemplate(CurrentRun.TemplateId);
+    var dueDate = GetDueDate(CurrentRun, template);
+    var progressCompleted = GetProgressCompletedCount(CurrentRun);
+    var progressTotal = CurrentRun.TestTaskRuns.Count;
+    var requiredCompleted = GetRequiredCompletedCount(CurrentRun, template);
+    var requiredTotal = GetRequiredTotalCount(template);
+    var statusBadgeClass = GetDaysRemainingBadgeClass(dueDate);
 
-    <section class="card str-card mb-4">
-        <div class="card-body d-flex flex-wrap justify-content-between gap-3 align-items-start">
-            <div>
-                <h2 class="h5 mb-3">Test Run Details</h2>
-                <p class="mb-1"><strong>Asset Tag:</strong> @asset?.AssetTag</p>
-                <p class="mb-1"><strong>Template Name:</strong> @template?.Name</p>
-                <p class="mb-0"><strong>Status:</strong> <span class="status-pill @GetRunStatusPillClass(CurrentRun)">@GetRunStatusLabel(CurrentRun)</span></p>
-            </div>
-            <div class="border rounded p-3 bg-light" style="min-width: 220px;">
-                <p class="text-uppercase text-muted small mb-1">Timer</p>
-                <p class="display-6 mb-2">@FormatElapsed(Elapsed)</p>
-                <div class="d-flex gap-2 flex-wrap">
-                    @if (!_timerStarted)
-                    {
-                        <button class="btn btn-sm btn-primary" @onclick="StartTimer">Start</button>
-                    }
-                    else if (_timerRunning)
-                    {
-                        <button class="btn btn-sm btn-outline-secondary" @onclick="PauseTimer">Pause</button>
-                    }
-                    else
-                    {
-                        <button class="btn btn-sm btn-primary" @onclick="ResumeTimer">Resume</button>
-                    }
+    <section class="card str-card mb-4 run-test-header">
+        <div class="card-body">
+            <div class="run-test-header__top">
+                <div class="run-test-header__left">
+                    <a class="btn btn-outline-secondary" href="/dashboard" aria-label="Back to dashboard">← Back</a>
+                    <div>
+                        <p class="run-test-header__asset mb-1">@(asset?.AssetTag ?? "Unknown Asset")</p>
+                        <p class="text-muted mb-0">@(asset is null ? "Asset details unavailable" : $"{asset.Type} • {asset.Location}")</p>
+                    </div>
                 </div>
+                <div class="run-test-header__right border rounded p-3 bg-light">
+                    <p class="text-uppercase text-muted small mb-1">Timer</p>
+                    <p class="display-6 mb-2">@FormatElapsed(Elapsed)</p>
+                    <div class="d-flex gap-2 flex-wrap justify-content-end">
+                        @if (!_timerStarted)
+                        {
+                            <button class="btn btn-sm btn-primary" @onclick="StartTimer">Start</button>
+                        }
+                        else if (_timerRunning)
+                        {
+                            <button class="btn btn-sm btn-outline-secondary" @onclick="PauseTimer">Pause</button>
+                        }
+                        else
+                        {
+                            <button class="btn btn-sm btn-primary" @onclick="ResumeTimer">Resume</button>
+                        }
+
+                        <button type="button"
+                                class="btn btn-sm btn-success"
+                                disabled="@(CurrentRun.Status == str_test_demo_blazor.Domain.TestRunStatus.Completed)"
+                                @onclick="CompleteTest">
+                            Complete Test
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="run-test-header__strip">
+                <span><strong>Test Type:</strong> @(template?.Name ?? "N/A")</span>
+                <span><strong>Due Date:</strong> @dueDate.ToString("yyyy-MM-dd")</span>
+                <span class="badge rounded-pill @statusBadgeClass">@GetDaysRemainingText(dueDate)</span>
+                <span><strong>Progress:</strong> @progressCompleted/@progressTotal tasks</span>
+                <span><strong>Required:</strong> @requiredCompleted/@requiredTotal</span>
+                <span><strong>Status:</strong> <span class="status-pill @GetRunStatusPillClass(CurrentRun)">@GetRunStatusLabel(CurrentRun)</span></span>
             </div>
         </div>
     </section>
@@ -106,7 +131,6 @@ else
                 </div>
             </div>
         </div>
-
         <div class="col-12 col-lg-5">
             <div class="card str-card h-100">
                 <div class="card-body">
@@ -162,14 +186,6 @@ else
                             {
                                 <span class="ms-3"><strong>Completed:</strong> @CurrentRun.CompletedAt.Value.ToString("g")</span>
                             }
-                        </div>
-                        <div class="d-flex gap-2 flex-wrap">
-                            <button type="button"
-                                    class="btn btn-success"
-                                    disabled="@(CurrentRun.Status == str_test_demo_blazor.Domain.TestRunStatus.Completed)"
-                                    @onclick="CompleteTest">
-                                Complete Test
-                            </button>
                         </div>
                     </div>
                 </div>
@@ -394,6 +410,64 @@ else
 
     private static string FormatElapsed(TimeSpan elapsed) =>
         $"{(int)elapsed.TotalMinutes:00}:{elapsed.Seconds:00}";
+
+    private static DateTime GetDueDate(str_test_demo_blazor.Domain.TestRun run, str_test_demo_blazor.Domain.TestTemplate? template)
+    {
+        var frequencyDays = template?.FrequencyDays ?? 0;
+        return run.StartedAt.Date.AddDays(Math.Max(1, frequencyDays));
+    }
+
+    private static int GetProgressCompletedCount(str_test_demo_blazor.Domain.TestRun run) =>
+        run.TestTaskRuns.Count(task => task.Result != str_test_demo_blazor.Domain.TestTaskResult.NotRun);
+
+    private static int GetRequiredTotalCount(str_test_demo_blazor.Domain.TestTemplate? template) =>
+        template?.TestTasks.Count(task => task.RequiresPhoto) ?? 0;
+
+    private static int GetRequiredCompletedCount(str_test_demo_blazor.Domain.TestRun run, str_test_demo_blazor.Domain.TestTemplate? template)
+    {
+        if (template is null)
+        {
+            return 0;
+        }
+
+        var requiredTemplateTaskIds = template.TestTasks
+            .Where(task => task.RequiresPhoto)
+            .Select(task => task.Id)
+            .ToHashSet();
+
+        return run.TestTaskRuns.Count(task =>
+            requiredTemplateTaskIds.Contains(task.TaskTemplateId)
+            && task.Result != str_test_demo_blazor.Domain.TestTaskResult.NotRun);
+    }
+
+    private static string GetDaysRemainingText(DateTime dueDate)
+    {
+        var daysRemaining = (dueDate.Date - DateTime.Today).Days;
+
+        if (daysRemaining < 0)
+        {
+            return $"{Math.Abs(daysRemaining)} day(s) overdue";
+        }
+
+        if (daysRemaining == 0)
+        {
+            return "Due today";
+        }
+
+        return $"{daysRemaining} day(s) remaining";
+    }
+
+    private static string GetDaysRemainingBadgeClass(DateTime dueDate)
+    {
+        var daysRemaining = (dueDate.Date - DateTime.Today).Days;
+
+        if (daysRemaining < 0)
+        {
+            return "text-bg-danger";
+        }
+
+        return daysRemaining == 0 ? "text-bg-warning" : "text-bg-info";
+    }
 
     public void Dispose()
     {

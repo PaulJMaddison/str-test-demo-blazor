@@ -1,3 +1,43 @@
+.run-test-header .card-body {
+    padding-bottom: 0.75rem;
+}
+
+.run-test-header__top {
+    display: flex;
+    justify-content: space-between;
+    gap: 1rem;
+    flex-wrap: wrap;
+    align-items: stretch;
+}
+
+.run-test-header__left {
+    display: flex;
+    align-items: flex-start;
+    gap: 1rem;
+    flex-wrap: wrap;
+}
+
+.run-test-header__asset {
+    font-size: 1.35rem;
+    font-weight: 700;
+    line-height: 1.2;
+}
+
+.run-test-header__right {
+    min-width: 280px;
+}
+
+.run-test-header__strip {
+    margin-top: 0.85rem;
+    padding-top: 0.6rem;
+    border-top: 1px solid #dee2e6;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem 1.1rem;
+    font-size: 0.9rem;
+    align-items: center;
+}
+
 .completion-banner {
     border-left: 0.4rem solid #198754;
 }
@@ -6,6 +46,16 @@
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
     gap: 0.65rem;
+}
+
+@media (max-width: 767.98px) {
+    .run-test-header__right {
+        width: 100%;
+    }
+
+    .run-test-header__right .d-flex {
+        justify-content: flex-start !important;
+    }
 }
 
 .photo-thumb {
