@@ -1,0 +1,87 @@
+<!-- filename: photo-evidence-barcode-scan.svg | suggested usage: Barcode scan / Asset identification / Intake -->
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="800" viewBox="0 0 1200 800">
+  <defs>
+    <linearGradient id="bgA" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#f7f9fc"/>
+      <stop offset="1" stop-color="#eef2f7"/>
+    </linearGradient>
+    <linearGradient id="hdrA" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#0b5fff"/>
+      <stop offset="1" stop-color="#00a3ff"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Background -->
+  <rect x="0" y="0" width="1200" height="800" fill="url(#bgA)"/>
+
+  <!-- Header bar -->
+  <rect x="40" y="36" rx="14" ry="14" width="1120" height="88" fill="url(#hdrA)"/>
+  <text x="70" y="92" font-family="system-ui, -apple-system, Segoe UI, Roboto, Arial" font-size="28" fill="#ffffff" font-weight="700">STR Evidence Photo</text>
+
+  <!-- Timestamp + Asset Tag placeholders -->
+  <g font-family="system-ui, -apple-system, Segoe UI, Roboto, Arial" font-size="16" fill="#eaf2ff">
+    <text x="760" y="72">Timestamp:</text>
+    <rect x="850" y="56" width="280" height="26" rx="8" fill="rgba(255,255,255,0.18)"/>
+    <text x="860" y="74" fill="#ffffff" opacity="0.9">YYYY-MM-DD HH:MM</text>
+
+    <text x="760" y="104">Asset Tag:</text>
+    <rect x="850" y="88" width="280" height="26" rx="8" fill="rgba(255,255,255,0.18)"/>
+    <text x="860" y="106" fill="#ffffff" opacity="0.9">ASSET-XXXXX</text>
+  </g>
+
+  <!-- Main frame -->
+  <rect x="40" y="140" width="1120" height="560" rx="18" fill="#ffffff" stroke="#d9e2ef"/>
+  <rect x="70" y="170" width="1060" height="480" rx="16" fill="#f9fbfe" stroke="#e3ebf6"/>
+
+  <!-- Abstract scene: tablet + scan beam + barcode -->
+  <!-- Tablet -->
+  <rect x="160" y="230" width="410" height="360" rx="26" fill="#0f172a" opacity="0.92"/>
+  <rect x="185" y="255" width="360" height="290" rx="18" fill="#0b1220"/>
+  <rect x="205" y="280" width="320" height="60" rx="12" fill="#111c33"/>
+  <text x="225" y="318" font-family="system-ui, -apple-system, Segoe UI, Roboto, Arial" font-size="18" fill="#cfe3ff" font-weight="600">Scan Asset Tag</text>
+
+  <!-- Scan target box -->
+  <rect x="220" y="365" width="290" height="140" rx="14" fill="none" stroke="#2dd4bf" stroke-width="4" stroke-dasharray="10 10"/>
+  <path d="M220 395 H510" stroke="#2dd4bf" stroke-width="3" opacity="0.8"/>
+  <path d="M220 435 H510" stroke="#2dd4bf" stroke-width="3" opacity="0.45"/>
+  <path d="M220 475 H510" stroke="#2dd4bf" stroke-width="3" opacity="0.25"/>
+
+  <!-- Barcode -->
+  <rect x="720" y="305" width="360" height="210" rx="18" fill="#ffffff" stroke="#d6deea"/>
+  <rect x="748" y="336" width="304" height="120" rx="10" fill="#f3f6fb" stroke="#e0e7f2"/>
+  <g transform="translate(770,352)" fill="#0f172a">
+    <rect x="0" y="0" width="6" height="88"/>
+    <rect x="12" y="0" width="2" height="88"/>
+    <rect x="20" y="0" width="10" height="88"/>
+    <rect x="36" y="0" width="4" height="88"/>
+    <rect x="48" y="0" width="2" height="88"/>
+    <rect x="56" y="0" width="8" height="88"/>
+    <rect x="70" y="0" width="3" height="88"/>
+    <rect x="80" y="0" width="12" height="88"/>
+    <rect x="98" y="0" width="2" height="88"/>
+    <rect x="106" y="0" width="6" height="88"/>
+    <rect x="118" y="0" width="3" height="88"/>
+    <rect x="128" y="0" width="9" height="88"/>
+    <rect x="144" y="0" width="2" height="88"/>
+    <rect x="152" y="0" width="12" height="88"/>
+    <rect x="170" y="0" width="4" height="88"/>
+    <rect x="182" y="0" width="2" height="88"/>
+    <rect x="190" y="0" width="10" height="88"/>
+    <rect x="206" y="0" width="3" height="88"/>
+    <rect x="216" y="0" width="12" height="88"/>
+    <rect x="234" y="0" width="2" height="88"/>
+    <rect x="242" y="0" width="6" height="88"/>
+    <rect x="254" y="0" width="4" height="88"/>
+    <rect x="266" y="0" width="10" height="88"/>
+    <rect x="282" y="0" width="2" height="88"/>
+  </g>
+  <text x="748" y="492" font-family="system-ui, -apple-system, Segoe UI, Roboto, Arial" font-size="14" fill="#334155">Code: ASSET-XXXXX</text>
+
+  <!-- Scan beam -->
+  <path d="M560 420 C620 360, 670 340, 720 360" fill="none" stroke="#0ea5e9" stroke-width="8" opacity="0.45"/>
+  <path d="M560 445 C625 395, 675 375, 720 395" fill="none" stroke="#22c55e" stroke-width="4" opacity="0.55"/>
+
+  <!-- Caption -->
+  <rect x="40" y="716" width="1120" height="44" rx="14" fill="#0b1220" opacity="0.06"/>
+  <text x="60" y="746" font-family="system-ui, -apple-system, Segoe UI, Roboto, Arial" font-size="18" fill="#0f172a" font-weight="700">Scenario: Barcode Scan</text>
+</svg>
