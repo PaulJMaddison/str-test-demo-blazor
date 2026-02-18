@@ -1,0 +1,66 @@
+@page "/run-test"
+@page "/run-test/{TestId:guid}"
+@inject NavigationManager Navigation
+
+<PageTitle>Run Test</PageTitle>
+
+<h1>Run Test</h1>
+<p class="text-muted">Demo-only test execution workflow with in-memory sample options.</p>
+
+<section class="card shadow-sm mb-4">
+    <div class="card-body">
+        <h2 class="h5">Start Test</h2>
+        <div class="row g-3">
+            <div class="col-12 col-md-6">
+                <label class="form-label" for="asset-select">Asset</label>
+                <select id="asset-select" class="form-select" @bind="SelectedAsset">
+                    @foreach (var asset in AssetOptions)
+                    {
+                        <option value="@asset">@asset</option>
+                    }
+                </select>
+            </div>
+            <div class="col-12 col-md-6">
+                <label class="form-label" for="template-select">Template</label>
+                <select id="template-select" class="form-select" @bind="SelectedTemplate">
+                    @foreach (var template in TemplateOptions)
+                    {
+                        <option value="@template">@template</option>
+                    }
+                </select>
+            </div>
+            <div class="col-12">
+                <button class="btn btn-primary btn-lg" @onclick="StartTest">Start</button>
+            </div>
+        </div>
+    </div>
+</section>
+
+@if (TestId is Guid guid)
+{
+    <section class="card shadow-sm">
+        <div class="card-body">
+            <h2 class="h5">Demo Test Session</h2>
+            <p class="mb-1"><strong>Test ID:</strong> @guid</p>
+            <p class="mb-1"><strong>Asset:</strong> @SelectedAsset</p>
+            <p class="mb-0"><strong>Template:</strong> @SelectedTemplate</p>
+        </div>
+    </section>
+}
+
+@code {
+    [Parameter]
+    public Guid? TestId { get; set; }
+
+    private readonly List<string> AssetOptions = ["Boiler #2", "Pump Station 7", "Generator C", "Compressor A"];
+    private readonly List<string> TemplateOptions = ["Safety Inspection", "Performance Check", "Calibration"];
+
+    private string SelectedAsset { get; set; } = "Boiler #2";
+    private string SelectedTemplate { get; set; } = "Safety Inspection";
+
+    private void StartTest()
+    {
+        var testId = Guid.NewGuid();
+        Navigation.NavigateTo($"/run-test/{testId}");
+    }
+}
