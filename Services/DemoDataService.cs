@@ -101,6 +101,14 @@ public class DemoDataService
         };
     }
 
+    private static readonly List<string> AssetPhotoEvidence =
+    [
+        "demo-images/asset-photos/asset-hydraulic-press.svg",
+        "demo-images/asset-photos/asset-crane-assembly.svg",
+        "demo-images/asset-photos/asset-compressor-unit.svg",
+        "demo-images/asset-photos/asset-power-panel.svg"
+    ];
+
     private void SeedRecentRuns()
     {
         AddCompletedRun(_assets[9].Id, _templates[0].Id, "A. Ruiz", 1);
@@ -134,14 +142,9 @@ public class DemoDataService
                     : "Not applicable for this asset configuration.";
             }
 
-            if (index % 3 == 1)
+            if (index % 2 == 0)
             {
-                task.PhotoSvgPaths.Add("demo-images/photo-placeholder-1.svg");
-                task.PhotoSvgPaths.Add("demo-images/photo-placeholder-2.svg");
-            }
-            else if (index % 3 == 2)
-            {
-                task.PhotoSvgPaths.Add("demo-images/camera-icon-placeholder.svg");
+                task.PhotoSvgPaths.Add(AssetPhotoEvidence[index % AssetPhotoEvidence.Count]);
             }
         }
     }
