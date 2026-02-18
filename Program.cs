@@ -1,6 +1,9 @@
 using str_test_demo_blazor.Components;
+using str_test_demo_blazor.Services;
 
 var builder = WebApplication.CreateBuilder(args);
+
+builder.Services.AddSingleton<DemoDataService>();
 
 builder.Services.AddRazorComponents()
     .AddInteractiveServerComponents();
