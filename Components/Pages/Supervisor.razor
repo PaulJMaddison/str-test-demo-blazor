@@ -7,7 +7,7 @@
 <p class="text-muted">Monthly supervisory overview for testing throughput, quality, and cycle times.</p>
 
 <section class="kpi-grid mb-4" aria-label="Supervisor KPI metrics">
-    @foreach (var metric in KpiCards)
+    @foreach (var metric in CurrentKpiCards)
     {
         <article class="metric-card @metric.ThemeClass">
             <div class="metric-card__icon-wrap" aria-hidden="true">
@@ -38,6 +38,7 @@
                 <option>South</option>
                 <option>East</option>
                 <option>West</option>
+                <option>Central</option>
             </select>
         </div>
         <div>
@@ -86,45 +87,174 @@
     private string SelectedRegion { get; set; } = "All Regions";
     private string SelectedOwner { get; set; } = "All Owners";
 
-    private static readonly IReadOnlyList<KpiMetric> KpiCards =
+    private static readonly string[] OutcomeLabels = ["Pass", "Fail", "N/A"];
+    private static readonly string[] OutcomeColors = ["#4CAF50", "#E57373", "#90A4AE"];
+    private static readonly string[] TestTypeLabels = ["Electrical Safety", "Functional", "Calibration", "Visual Inspection", "Leak Test"];
+    private static readonly string[] TestTypeColors = ["#1E3A8A", "#2563EB", "#3B82F6", "#60A5FA", "#93C5FD"];
+    private static readonly string[] RegionPalette = ["#1E40AF", "#2563EB", "#3B82F6", "#60A5FA", "#93C5FD"];
+
+    private static readonly IReadOnlyList<RegionOwnerSnapshot> SnapshotData =
     [
-        new("Tests This Month", "152", "metric-card--today", "demo-images/icon-clipboard.svg"),
-        new("Overdue Tests", "18", "metric-card--overdue", "demo-images/icon-alert.svg"),
-        new("Avg Completion Time", "64 min", "metric-card--completion", "demo-images/icon-timer.svg"),
-        new("Unassigned Tests", "9", "metric-card--open", "demo-images/icon-dashboard.svg")
+        new("North", "Field Team A", 52, 45, 5, 2, 68, 56, 62, 42, 50),
+        new("North", "Field Team B", 47, 39, 6, 2, 70, 60, 65, 44, 53),
+        new("North", "Contractor", 30, 24, 4, 2, 75, 63, 69, 46, 57),
+
+        new("South", "Field Team A", 44, 37, 5, 2, 69, 57, 61, 43, 51),
+        new("South", "Field Team B", 41, 33, 6, 2, 72, 61, 66, 46, 55),
+        new("South", "Contractor", 27, 21, 4, 2, 76, 64, 70, 49, 58),
+
+        new("East", "Field Team A", 49, 42, 5, 2, 67, 55, 60, 41, 49),
+        new("East", "Field Team B", 45, 37, 6, 2, 71, 59, 64, 45, 54),
+        new("East", "Contractor", 29, 23, 4, 2, 74, 62, 68, 47, 56),
+
+        new("West", "Field Team A", 39, 32, 5, 2, 70, 58, 63, 44, 52),
+        new("West", "Field Team B", 36, 29, 5, 2, 73, 62, 67, 47, 55),
+        new("West", "Contractor", 23, 18, 3, 2, 77, 65, 71, 50, 59),
+
+        new("Central", "Field Team A", 46, 39, 5, 2, 66, 54, 59, 40, 48),
+        new("Central", "Field Team B", 42, 35, 5, 2, 69, 58, 63, 43, 52),
+        new("Central", "Contractor", 28, 22, 4, 2, 73, 61, 67, 46, 55)
     ];
 
-    private static readonly IReadOnlyList<RegionMetric> RegionData =
-    [
-        new("North", 36),
-        new("South", 28),
-        new("East", 33),
-        new("West", 24),
-        new("Central", 31)
-    ];
+    private IEnumerable<RegionOwnerSnapshot> FilteredSnapshots => SnapshotData.Where(MatchesFilters);
 
-    private static readonly IReadOnlyList<TestTypeMetric> TestTypeData =
-    [
-        new("Electrical Safety", 72),
-        new("Functional", 58),
-        new("Calibration", 66),
-        new("Visual Inspection", 41),
-        new("Leak Test", 53)
-    ];
+    private IReadOnlyList<KpiMetric> CurrentKpiCards
+    {
+        get
+        {
+            var snapshots = FilteredSnapshots.ToList();
+            var completed = ScaleCount(snapshots.Sum(snapshot => snapshot.Completed));
+            var fail = ScaleCount(snapshots.Sum(snapshot => snapshot.Fail));
+            var notApplicable = ScaleCount(snapshots.Sum(snapshot => snapshot.NotApplicable));
+            var avgMinutes = (int)Math.Round(ComputeWeightedAverageMinutes(snapshots));
+            var overdue = (int)Math.Round((fail + notApplicable) * 0.58, MidpointRounding.AwayFromZero);
+            var unassigned = Math.Max(2, (int)Math.Round(completed * 0.05, MidpointRounding.AwayFromZero));
 
-    private static string[] RegionLabels => RegionData.Select(region => region.Name).ToArray();
-    private static double[] RegionValues => RegionData.Select(region => (double)region.Completed).ToArray();
-    private static string[] RegionColors => ["#4472c4", "#5b9bd5", "#70ad47", "#ffc000", "#ed7d31"];
+            return
+            [
+                new("Tests in Window", completed.ToString(), "metric-card--today", "demo-images/icon-clipboard.svg"),
+                new("Overdue Tests", overdue.ToString(), "metric-card--overdue", "demo-images/icon-alert.svg"),
+                new("Avg Completion Time", $"{avgMinutes} min", "metric-card--completion", "demo-images/icon-timer.svg"),
+                new("Unassigned Tests", unassigned.ToString(), "metric-card--open", "demo-images/icon-dashboard.svg")
+            ];
+        }
+    }
 
-    private static string[] OutcomeLabels => ["Pass", "Fail", "N/A"];
-    private static double[] OutcomeValues => [82, 12, 6];
-    private static string[] OutcomeColors => ["#70ad47", "#ed7d31", "#a5a5a5"];
+    private string[] RegionLabels => FilteredSnapshots
+        .GroupBy(snapshot => snapshot.Region)
+        .OrderBy(group => group.Key)
+        .Select(group => group.Key)
+        .ToArray();
 
-    private static string[] TestTypeLabels => TestTypeData.Select(testType => testType.Name).ToArray();
-    private static double[] TestTypeValues => TestTypeData.Select(testType => (double)testType.AverageMinutes).ToArray();
-    private static string[] TestTypeColors => ["#264478", "#4472c4", "#5b9bd5", "#70ad47", "#ffc000"];
+    private double[] RegionValues => FilteredSnapshots
+        .GroupBy(snapshot => snapshot.Region)
+        .OrderBy(group => group.Key)
+        .Select(group => (double)ScaleCount(group.Sum(snapshot => snapshot.Completed)))
+        .ToArray();
+
+    private string[] RegionColors => RegionLabels
+        .Select((label, i) => RegionPalette[i % RegionPalette.Length])
+        .ToArray();
+
+    private double[] OutcomeValues
+    {
+        get
+        {
+            var snapshots = FilteredSnapshots.ToList();
+            return
+            [
+                ScaleCount(snapshots.Sum(snapshot => snapshot.Pass)),
+                ScaleCount(snapshots.Sum(snapshot => snapshot.Fail)),
+                ScaleCount(snapshots.Sum(snapshot => snapshot.NotApplicable))
+            ];
+        }
+    }
+
+    private double[] TestTypeValues
+    {
+        get
+        {
+            var snapshots = FilteredSnapshots.ToList();
+            var durationAdjustment = SelectedWindow switch
+            {
+                "7 days" => 2,
+                "90 days" => -2,
+                _ => 0
+            };
+
+            if (snapshots.Count == 0)
+            {
+                return [0, 0, 0, 0, 0];
+            }
+
+            return
+            [
+                Math.Round(snapshots.Average(snapshot => snapshot.ElectricalSafetyMinutes) + durationAdjustment, 1),
+                Math.Round(snapshots.Average(snapshot => snapshot.FunctionalMinutes) + durationAdjustment, 1),
+                Math.Round(snapshots.Average(snapshot => snapshot.CalibrationMinutes) + durationAdjustment, 1),
+                Math.Round(snapshots.Average(snapshot => snapshot.VisualInspectionMinutes) + durationAdjustment, 1),
+                Math.Round(snapshots.Average(snapshot => snapshot.LeakTestMinutes) + durationAdjustment, 1)
+            ];
+        }
+    }
+
+    private bool MatchesFilters(RegionOwnerSnapshot snapshot)
+    {
+        var regionMatch = SelectedRegion == "All Regions" || snapshot.Region == SelectedRegion;
+        var ownerMatch = SelectedOwner == "All Owners" || snapshot.Owner == SelectedOwner;
+        return regionMatch && ownerMatch;
+    }
+
+    private int ScaleCount(int value)
+    {
+        var multiplier = SelectedWindow switch
+        {
+            "7 days" => 0.23,
+            "90 days" => 2.9,
+            _ => 1.0
+        };
+
+        return (int)Math.Max(1, Math.Round(value * multiplier, MidpointRounding.AwayFromZero));
+    }
+
+    private double ComputeWeightedAverageMinutes(IReadOnlyList<RegionOwnerSnapshot> snapshots)
+    {
+        if (snapshots.Count == 0)
+        {
+            return 0;
+        }
+
+        var totalCompleted = snapshots.Sum(snapshot => snapshot.Completed);
+        if (totalCompleted == 0)
+        {
+            return 0;
+        }
+
+        var weightedSum = snapshots.Sum(snapshot => snapshot.Completed *
+            (snapshot.ElectricalSafetyMinutes + snapshot.FunctionalMinutes + snapshot.CalibrationMinutes + snapshot.VisualInspectionMinutes + snapshot.LeakTestMinutes) / 5.0);
+
+        var adjustment = SelectedWindow switch
+        {
+            "7 days" => 2,
+            "90 days" => -2,
+            _ => 0
+        };
+
+        return (weightedSum / totalCompleted) + adjustment;
+    }
 
     private sealed record KpiMetric(string Label, string Value, string ThemeClass, string IconPath);
-    private sealed record RegionMetric(string Name, int Completed);
-    private sealed record TestTypeMetric(string Name, int AverageMinutes);
+
+    private sealed record RegionOwnerSnapshot(
+        string Region,
+        string Owner,
+        int Completed,
+        int Pass,
+        int Fail,
+        int NotApplicable,
+        int ElectricalSafetyMinutes,
+        int FunctionalMinutes,
+        int CalibrationMinutes,
+        int VisualInspectionMinutes,
+        int LeakTestMinutes);
 }
