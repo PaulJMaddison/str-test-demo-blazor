@@ -6,35 +6,81 @@
 <h1>Dashboard</h1>
 <p class="text-muted">Demo-only view of key testing metrics using in-memory service data.</p>
 
-<div class="row g-3 mb-4">
-    <div class="col-12 col-md-4">
-        <div class="card h-100 shadow-sm">
-            <div class="card-body">
-                <h2 class="h6 text-uppercase text-muted">Tests Today</h2>
-                <p class="display-6 mb-0">@TestsToday</p>
-            </div>
+<section class="kpi-grid mb-4" aria-label="Key metrics">
+    <article class="metric-card metric-card--today">
+        <div class="metric-card__icon-wrap" aria-hidden="true">
+            <img src="demo-images/icon-dashboard.svg" alt="" class="metric-card__icon" />
         </div>
-    </div>
-    <div class="col-12 col-md-4">
-        <div class="card h-100 shadow-sm">
-            <div class="card-body">
-                <h2 class="h6 text-uppercase text-muted">Open Tests</h2>
-                <p class="display-6 mb-0">@OpenTests</p>
-            </div>
-        </div>
-    </div>
-    <div class="col-12 col-md-4">
-        <div class="card h-100 shadow-sm">
-            <div class="card-body">
-                <h2 class="h6 text-uppercase text-muted">Overdue</h2>
-                <p class="display-6 mb-0">@Overdue</p>
-            </div>
-        </div>
-    </div>
-</div>
+        <p class="metric-card__label">Tests Today</p>
+        <p class="metric-card__value">@TestsToday</p>
+    </article>
 
-<section class="card shadow-sm">
+    <article class="metric-card metric-card--open">
+        <div class="metric-card__icon-wrap" aria-hidden="true">
+            <img src="demo-images/icon-clipboard.svg" alt="" class="metric-card__icon" />
+        </div>
+        <p class="metric-card__label">Open Tests</p>
+        <p class="metric-card__value">@OpenTests</p>
+    </article>
+
+    <article class="metric-card metric-card--overdue">
+        <div class="metric-card__icon-wrap" aria-hidden="true">
+            <img src="demo-images/icon-alert.svg" alt="" class="metric-card__icon" />
+        </div>
+        <p class="metric-card__label">Overdue</p>
+        <p class="metric-card__value">@Overdue</p>
+    </article>
+
+    <article class="metric-card metric-card--completion">
+        <div class="metric-card__icon-wrap" aria-hidden="true">
+            <img src="demo-images/icon-timer.svg" alt="" class="metric-card__icon" />
+        </div>
+        <p class="metric-card__label">Avg Completion Time</p>
+        <p class="metric-card__value">@AverageCompletionTimeDisplay</p>
+    </article>
+</section>
+
+<section class="recent-tests card shadow-sm" aria-labelledby="recent-tests-title">
     <div class="card-body">
+        <h2 class="h5" id="recent-tests-title">Recent Tests</h2>
+
+        <ul class="recent-tests__list" aria-label="Recent test runs">
+            @foreach (var test in RecentTests)
+            {
+                var asset = DemoData.FindAsset(test.AssetId);
+                var statusClass = test.Status switch
+                {
+                    str_test_demo_blazor.Domain.TestRunStatus.Completed => "status-pill--completed",
+                    str_test_demo_blazor.Domain.TestRunStatus.InProgress => "status-pill--progress",
+                    _ => "status-pill--progress"
+                };
+
+                <li class="recent-test-item">
+                    <article class="recent-test-card" aria-label="Test @test.Id">
+                        <header class="recent-test-card__header">
+                            <span class="status-pill @statusClass">@test.Status</span>
+                            <span class="asset-tag">@asset?.AssetTag</span>
+                        </header>
+
+                        <div class="recent-test-card__meta">
+                            <span class="meta-block">
+                                <span class="meta-label">Technician</span>
+                                <span class="meta-value">@test.TechnicianName</span>
+                            </span>
+                            <span class="meta-block">
+                                <span class="meta-label">Timestamp</span>
+                                <span class="meta-value">@(test.CompletedAt?.ToString("yyyy-MM-dd HH:mm") ?? "In progress")</span>
+                            </span>
+                        </div>
+
+                        @if (test.Status == str_test_demo_blazor.Domain.TestRunStatus.Completed)
+                        {
+                            <a class="recent-test-card__link" href="@($"/certificate/{test.Id}")">View certificate</a>
+                        }
+                    </article>
+                </li>
+            }
+        </ul>
         <h2 class="h5">Recent Tests</h2>
         <div class="table-responsive">
             <table class="table table-striped align-middle mb-0">
@@ -51,6 +97,7 @@
                     @foreach (var test in RecentTests)
                     {
                         var asset = DemoData.FindAsset(test.AssetId);
+                        var statusLabel = GetStatusLabel(test);
 
                         <tr>
                             <td>
@@ -64,7 +111,9 @@
                                 }
                             </td>
                             <td>@asset?.AssetTag</td>
-                            <td>@test.Status</td>
+                            <td>
+                                <span class="status-pill @GetStatusPillClass(statusLabel)">@statusLabel</span>
+                            </td>
                             <td>@test.TechnicianName</td>
                             <td>@(test.CompletedAt?.ToString("yyyy-MM-dd HH:mm") ?? "In progress")</td>
                         </tr>
@@ -78,10 +127,38 @@
 @code {
     private int TestsToday => DemoData.TestRuns.Count(run => run.StartedAt.Date == DateTime.Today);
     private int OpenTests => DemoData.TestRuns.Count(run => run.Status != str_test_demo_blazor.Domain.TestRunStatus.Completed);
-    private int Overdue => DemoData.TestRuns.Count(run =>
-        run.Status != str_test_demo_blazor.Domain.TestRunStatus.Completed
-        && run.StartedAt < DateTime.Now.AddHours(-4));
+    private int Overdue => DemoData.TestRuns.Count(IsOverdue);
+
+    private string AverageCompletionTimeDisplay => "2h 15m";
 
     private IEnumerable<str_test_demo_blazor.Domain.TestRun> RecentTests =>
         DemoData.TestRuns.OrderByDescending(run => run.StartedAt).Take(10);
+
+    private static bool IsOverdue(str_test_demo_blazor.Domain.TestRun run) =>
+        run.Status != str_test_demo_blazor.Domain.TestRunStatus.Completed
+        && run.StartedAt < DateTime.Now.AddHours(-4);
+
+    private static string GetStatusLabel(str_test_demo_blazor.Domain.TestRun run)
+    {
+        if (IsOverdue(run))
+        {
+            return "Overdue";
+        }
+
+        return run.Status switch
+        {
+            str_test_demo_blazor.Domain.TestRunStatus.NotStarted => "Open",
+            str_test_demo_blazor.Domain.TestRunStatus.InProgress => "In Progress",
+            str_test_demo_blazor.Domain.TestRunStatus.Completed => "Completed",
+            _ => "Open"
+        };
+    }
+
+    private static string GetStatusPillClass(string statusLabel) => statusLabel switch
+    {
+        "In Progress" => "status-pill-in-progress",
+        "Completed" => "status-pill-completed",
+        "Overdue" => "status-pill-overdue",
+        _ => "status-pill-open"
+    };
 }

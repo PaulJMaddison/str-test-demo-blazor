@@ -53,7 +53,7 @@ else
                 <h2 class="h5 mb-3">Test Run Details</h2>
                 <p class="mb-1"><strong>Asset Tag:</strong> @asset?.AssetTag</p>
                 <p class="mb-1"><strong>Template Name:</strong> @template?.Name</p>
-                <p class="mb-0"><strong>Status:</strong> @CurrentRun.Status</p>
+                <p class="mb-0"><strong>Status:</strong> <span class="status-pill @GetRunStatusPillClass(CurrentRun)">@GetRunStatusLabel(CurrentRun)</span></p>
             </div>
             <div class="border rounded p-3 bg-light" style="min-width: 220px;">
                 <p class="text-uppercase text-muted small mb-1">Timer</p>
@@ -260,6 +260,25 @@ else
 
         SelectedTask.Comment = args.Value?.ToString();
     }
+
+    private static string GetRunStatusLabel(str_test_demo_blazor.Domain.TestRun run)
+    {
+        if (run.Status == str_test_demo_blazor.Domain.TestRunStatus.NotStarted)
+        {
+            return "Open";
+        }
+
+        return run.Status == str_test_demo_blazor.Domain.TestRunStatus.InProgress
+            ? "In Progress"
+            : "Completed";
+    }
+
+    private static string GetRunStatusPillClass(str_test_demo_blazor.Domain.TestRun run) => run.Status switch
+    {
+        str_test_demo_blazor.Domain.TestRunStatus.InProgress => "status-pill-in-progress",
+        str_test_demo_blazor.Domain.TestRunStatus.Completed => "status-pill-completed",
+        _ => "status-pill-open"
+    };
 
     private void AddPhoto()
     {
