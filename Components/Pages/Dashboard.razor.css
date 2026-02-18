@@ -1,0 +1,141 @@
+.kpi-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 1rem;
+}
+
+.metric-card {
+    border-radius: 0.9rem;
+    padding: 1rem 1.1rem;
+    color: #0f172a;
+    box-shadow: 0 8px 24px rgba(15, 23, 42, 0.08);
+    border: 1px solid rgba(148, 163, 184, 0.2);
+}
+
+.metric-card--today {
+    background: linear-gradient(135deg, #eef6ff, #f8fbff);
+}
+
+.metric-card--open {
+    background: linear-gradient(135deg, #effcf6, #f7fffb);
+}
+
+.metric-card--overdue {
+    background: linear-gradient(135deg, #fff4f4, #fffafa);
+}
+
+.metric-card--completion {
+    background: linear-gradient(135deg, #f4f3ff, #faf9ff);
+}
+
+.metric-card__icon-wrap {
+    width: 2rem;
+    height: 2rem;
+    border-radius: 0.5rem;
+    background-color: rgba(255, 255, 255, 0.75);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 0.75rem;
+}
+
+.metric-card__icon {
+    width: 1.25rem;
+    height: 1.25rem;
+}
+
+.metric-card__label {
+    font-size: 0.78rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: #64748b;
+    margin-bottom: 0.35rem;
+}
+
+.metric-card__value {
+    font-size: clamp(1.8rem, 3.5vw, 2.2rem);
+    font-weight: 700;
+    line-height: 1.1;
+    margin-bottom: 0;
+}
+
+.recent-tests__list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    gap: 0.75rem;
+}
+
+.recent-test-card {
+    border: 1px solid #e2e8f0;
+    border-radius: 0.75rem;
+    padding: 0.9rem;
+    background-color: #fff;
+}
+
+.recent-test-card__header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 0.75rem;
+    margin-bottom: 0.75rem;
+}
+
+.status-pill {
+    display: inline-flex;
+    padding: 0.2rem 0.6rem;
+    border-radius: 999px;
+    font-size: 0.72rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+}
+
+.status-pill--completed {
+    background-color: #dcfce7;
+    color: #166534;
+}
+
+.status-pill--progress {
+    background-color: #dbeafe;
+    color: #1d4ed8;
+}
+
+
+.asset-tag {
+    font-size: 0.85rem;
+    color: #334155;
+    font-weight: 600;
+}
+
+.recent-test-card__meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+}
+
+.meta-block {
+    display: inline-flex;
+    flex-direction: column;
+    min-width: 9rem;
+}
+
+.meta-label {
+    font-size: 0.72rem;
+    text-transform: uppercase;
+    color: #94a3b8;
+    letter-spacing: 0.04em;
+}
+
+.meta-value {
+    color: #0f172a;
+    font-size: 0.92rem;
+}
+
+.recent-test-card__link {
+    display: inline-block;
+    margin-top: 0.75rem;
+    font-weight: 600;
+}
