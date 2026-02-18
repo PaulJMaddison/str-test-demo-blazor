@@ -1,10 +1,39 @@
 @page "/assets"
+@rendermode InteractiveServer
 @inject str_test_demo_blazor.Services.DemoDataService DemoData
+@inject NavigationManager Navigation
 
 <PageTitle>Assets</PageTitle>
 
 <h1>Assets</h1>
 <p class="text-muted">Demo-only asset catalog displayed from in-memory service data.</p>
+
+<button type="button" class="btn btn-primary btn-lg mb-3" @onclick="OpenScanModal">Scan Asset</button>
+
+@if (IsScanModalOpen)
+{
+    <div class="scan-modal-backdrop" @onclick="CloseScanModal"></div>
+    <div class="scan-modal" role="dialog" aria-modal="true" aria-labelledby="scan-modal-title">
+        <div class="card shadow scan-modal-card">
+            <div class="card-body">
+                <h2 class="h4" id="scan-modal-title">Scan Asset Tag</h2>
+                <p class="text-muted mb-3">Demo scan: type or paste an asset tag</p>
+                <img class="scan-frame mb-3" src="demo-images/scan-frame.svg" alt="Decorative scan frame" />
+                <label class="form-label" for="scan-asset-tag">Asset tag</label>
+                <input id="scan-asset-tag" class="form-control" @bind="ScannedAssetTag" @bind:event="oninput" />
+                @if (!string.IsNullOrWhiteSpace(ScanError))
+                {
+                    <p class="text-danger mt-2 mb-0">@ScanError</p>
+                }
+
+                <div class="d-flex justify-content-end gap-2 mt-4">
+                    <button type="button" class="btn btn-outline-secondary" @onclick="CloseScanModal">Cancel</button>
+                    <button type="button" class="btn btn-primary" @onclick="ContinueScan">Continue</button>
+                </div>
+            </div>
+        </div>
+    </div>
+}
 
 <section class="card shadow-sm">
     <div class="card-body">
@@ -45,6 +74,9 @@
 
 @code {
     private string SearchTerm { get; set; } = string.Empty;
+    private bool IsScanModalOpen { get; set; }
+    private string ScannedAssetTag { get; set; } = string.Empty;
+    private string? ScanError { get; set; }
 
     private IEnumerable<str_test_demo_blazor.Domain.Asset> FilteredAssets => DemoData.Assets.Where(asset =>
         string.IsNullOrWhiteSpace(SearchTerm)
@@ -55,4 +87,38 @@
         || Contains(asset.Status));
 
     private bool Contains(string value) => value.Contains(SearchTerm, StringComparison.OrdinalIgnoreCase);
+
+    private void OpenScanModal()
+    {
+        ScanError = null;
+        ScannedAssetTag = string.Empty;
+        IsScanModalOpen = true;
+    }
+
+    private void CloseScanModal()
+    {
+        IsScanModalOpen = false;
+        ScanError = null;
+    }
+
+    private void ContinueScan()
+    {
+        if (string.IsNullOrWhiteSpace(ScannedAssetTag))
+        {
+            ScanError = "Asset not found in demo data";
+            return;
+        }
+
+        var match = DemoData.Assets.FirstOrDefault(asset =>
+            asset.AssetTag.Equals(ScannedAssetTag.Trim(), StringComparison.OrdinalIgnoreCase));
+
+        if (match is null)
+        {
+            ScanError = "Asset not found in demo data";
+            return;
+        }
+
+        IsScanModalOpen = false;
+        Navigation.NavigateTo($"/run-test?assetTag={Uri.EscapeDataString(match.AssetTag)}");
+    }
 }
