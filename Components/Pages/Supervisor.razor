@@ -7,7 +7,7 @@
 <p class="text-muted">Monthly supervisory overview for testing throughput, quality, and cycle times.</p>
 
 <section class="kpi-grid mb-4" aria-label="Supervisor KPI metrics">
-    @foreach (var metric in KpiCards)
+    @foreach (var metric in CurrentKpiCards)
     {
         <article class="metric-card @metric.ThemeClass">
             <div class="metric-card__icon-wrap" aria-hidden="true">
@@ -18,7 +18,6 @@
         </article>
     }
 </section>
-
 
 <section class="card str-card mb-4" aria-label="Supervisor filters">
     <div class="card-body supervisor-filters">
@@ -38,6 +37,7 @@
                 <option>South</option>
                 <option>East</option>
                 <option>West</option>
+                <option>Central</option>
             </select>
         </div>
         <div>
@@ -86,45 +86,176 @@
     private string SelectedRegion { get; set; } = "All Regions";
     private string SelectedOwner { get; set; } = "All Owners";
 
-    private static readonly IReadOnlyList<KpiMetric> KpiCards =
+    private static readonly string[] OutcomeLabels = ["Pass", "Fail", "N/A"];
+    private static readonly string[] OutcomeColors = ["#4CAF50", "#E57373", "#90A4AE"];
+    private static readonly string[] TestTypeLabels = ["Electrical Safety", "Functional", "Calibration", "Visual Inspection", "Leak Test"];
+    private static readonly string[] TestTypeColors = ["#1E3A8A", "#2563EB", "#3B82F6", "#60A5FA", "#93C5FD"];
+    private static readonly string[] RegionPalette = ["#1E40AF", "#2563EB", "#3B82F6", "#60A5FA", "#93C5FD"];
+
+    private static readonly IReadOnlyList<PerformanceSnapshot> SnapshotData =
     [
-        new("Tests This Month", "152", "metric-card--today", "demo-images/icon-clipboard.svg"),
-        new("Overdue Tests", "18", "metric-card--overdue", "demo-images/icon-alert.svg"),
-        new("Avg Completion Time", "64 min", "metric-card--completion", "demo-images/icon-timer.svg"),
-        new("Unassigned Tests", "9", "metric-card--open", "demo-images/icon-dashboard.svg")
+        // 7 days
+        new("7 days", "North", "Field Team A", 13, 11, 2, 0, 63, 51, 57, 38, 46, 3, 1),
+        new("7 days", "North", "Field Team B", 11, 9, 1, 1, 66, 55, 60, 40, 49, 2, 1),
+        new("7 days", "North", "Contractor", 7, 5, 1, 1, 71, 58, 64, 43, 53, 2, 0),
+        new("7 days", "South", "Field Team A", 12, 10, 1, 1, 64, 52, 58, 39, 47, 2, 1),
+        new("7 days", "South", "Field Team B", 10, 8, 1, 1, 67, 56, 61, 41, 50, 2, 1),
+        new("7 days", "South", "Contractor", 6, 4, 1, 1, 72, 59, 65, 44, 54, 1, 0),
+        new("7 days", "East", "Field Team A", 12, 10, 1, 1, 62, 50, 56, 37, 45, 2, 1),
+        new("7 days", "East", "Field Team B", 11, 9, 1, 1, 65, 54, 59, 39, 48, 2, 1),
+        new("7 days", "East", "Contractor", 6, 5, 1, 0, 70, 57, 63, 42, 52, 1, 0),
+        new("7 days", "West", "Field Team A", 10, 8, 1, 1, 65, 53, 58, 40, 48, 2, 1),
+        new("7 days", "West", "Field Team B", 9, 7, 1, 1, 68, 56, 61, 42, 50, 2, 1),
+        new("7 days", "West", "Contractor", 5, 4, 1, 0, 73, 60, 66, 45, 55, 1, 0),
+        new("7 days", "Central", "Field Team A", 11, 9, 1, 1, 61, 49, 55, 36, 44, 2, 1),
+        new("7 days", "Central", "Field Team B", 10, 8, 1, 1, 64, 52, 58, 38, 47, 2, 1),
+        new("7 days", "Central", "Contractor", 6, 5, 1, 0, 69, 56, 62, 41, 51, 1, 0),
+
+        // 30 days
+        new("30 days", "North", "Field Team A", 52, 45, 5, 2, 68, 56, 62, 42, 50, 7, 3),
+        new("30 days", "North", "Field Team B", 47, 39, 6, 2, 70, 60, 65, 44, 53, 6, 3),
+        new("30 days", "North", "Contractor", 30, 24, 4, 2, 75, 63, 69, 46, 57, 4, 2),
+        new("30 days", "South", "Field Team A", 44, 37, 5, 2, 69, 57, 61, 43, 51, 6, 2),
+        new("30 days", "South", "Field Team B", 41, 33, 6, 2, 72, 61, 66, 46, 55, 5, 2),
+        new("30 days", "South", "Contractor", 27, 21, 4, 2, 76, 64, 70, 49, 58, 3, 1),
+        new("30 days", "East", "Field Team A", 49, 42, 5, 2, 67, 55, 60, 41, 49, 6, 2),
+        new("30 days", "East", "Field Team B", 45, 37, 6, 2, 71, 59, 64, 45, 54, 5, 2),
+        new("30 days", "East", "Contractor", 29, 23, 4, 2, 74, 62, 68, 47, 56, 3, 1),
+        new("30 days", "West", "Field Team A", 39, 32, 5, 2, 70, 58, 63, 44, 52, 5, 2),
+        new("30 days", "West", "Field Team B", 36, 29, 5, 2, 73, 62, 67, 47, 55, 4, 2),
+        new("30 days", "West", "Contractor", 23, 18, 3, 2, 77, 65, 71, 50, 59, 3, 1),
+        new("30 days", "Central", "Field Team A", 46, 39, 5, 2, 66, 54, 59, 40, 48, 6, 2),
+        new("30 days", "Central", "Field Team B", 42, 35, 5, 2, 69, 58, 63, 43, 52, 5, 2),
+        new("30 days", "Central", "Contractor", 28, 22, 4, 2, 73, 61, 67, 46, 55, 3, 1),
+
+        // 90 days
+        new("90 days", "North", "Field Team A", 150, 131, 14, 5, 67, 55, 61, 41, 50, 18, 9),
+        new("90 days", "North", "Field Team B", 141, 120, 16, 5, 69, 58, 64, 43, 52, 17, 8),
+        new("90 days", "North", "Contractor", 91, 74, 12, 5, 73, 61, 67, 45, 55, 12, 6),
+        new("90 days", "South", "Field Team A", 132, 112, 14, 6, 68, 56, 61, 42, 50, 16, 8),
+        new("90 days", "South", "Field Team B", 124, 103, 15, 6, 71, 59, 65, 44, 53, 15, 7),
+        new("90 days", "South", "Contractor", 84, 67, 12, 5, 75, 62, 69, 47, 56, 10, 5),
+        new("90 days", "East", "Field Team A", 146, 126, 14, 6, 66, 54, 60, 40, 49, 17, 8),
+        new("90 days", "East", "Field Team B", 136, 114, 16, 6, 70, 58, 63, 43, 52, 16, 8),
+        new("90 days", "East", "Contractor", 89, 72, 12, 5, 74, 61, 67, 45, 55, 11, 5),
+        new("90 days", "West", "Field Team A", 117, 97, 14, 6, 69, 57, 62, 43, 51, 15, 7),
+        new("90 days", "West", "Field Team B", 109, 89, 14, 6, 72, 60, 66, 46, 54, 14, 7),
+        new("90 days", "West", "Contractor", 79, 62, 11, 6, 76, 63, 70, 48, 58, 10, 4),
+        new("90 days", "Central", "Field Team A", 138, 118, 14, 6, 65, 53, 58, 39, 47, 16, 8),
+        new("90 days", "Central", "Field Team B", 128, 107, 15, 6, 68, 56, 62, 42, 50, 15, 7),
+        new("90 days", "Central", "Contractor", 86, 69, 12, 5, 72, 60, 66, 45, 54, 11, 5)
     ];
 
-    private static readonly IReadOnlyList<RegionMetric> RegionData =
-    [
-        new("North", 36),
-        new("South", 28),
-        new("East", 33),
-        new("West", 24),
-        new("Central", 31)
-    ];
+    private IEnumerable<PerformanceSnapshot> FilteredSnapshots => SnapshotData
+        .Where(snapshot => snapshot.Window == SelectedWindow)
+        .Where(snapshot => SelectedRegion == "All Regions" || snapshot.Region == SelectedRegion)
+        .Where(snapshot => SelectedOwner == "All Owners" || snapshot.Owner == SelectedOwner);
 
-    private static readonly IReadOnlyList<TestTypeMetric> TestTypeData =
-    [
-        new("Electrical Safety", 72),
-        new("Functional", 58),
-        new("Calibration", 66),
-        new("Visual Inspection", 41),
-        new("Leak Test", 53)
-    ];
+    private IReadOnlyList<KpiMetric> CurrentKpiCards
+    {
+        get
+        {
+            var snapshots = FilteredSnapshots.ToList();
+            var completed = snapshots.Sum(snapshot => snapshot.Completed);
+            var overdue = snapshots.Sum(snapshot => snapshot.Overdue);
+            var unassigned = snapshots.Sum(snapshot => snapshot.Unassigned);
+            var avgMinutes = (int)Math.Round(ComputeWeightedAverageMinutes(snapshots), MidpointRounding.AwayFromZero);
 
-    private static string[] RegionLabels => RegionData.Select(region => region.Name).ToArray();
-    private static double[] RegionValues => RegionData.Select(region => (double)region.Completed).ToArray();
-    private static string[] RegionColors => ["#4472c4", "#5b9bd5", "#70ad47", "#ffc000", "#ed7d31"];
+            return
+            [
+                new("Tests in Window", completed.ToString(), "metric-card--today", "demo-images/icon-clipboard.svg"),
+                new("Overdue Tests", overdue.ToString(), "metric-card--overdue", "demo-images/icon-alert.svg"),
+                new("Avg Completion Time", $"{avgMinutes} min", "metric-card--completion", "demo-images/icon-timer.svg"),
+                new("Unassigned Tests", unassigned.ToString(), "metric-card--open", "demo-images/icon-dashboard.svg")
+            ];
+        }
+    }
 
-    private static string[] OutcomeLabels => ["Pass", "Fail", "N/A"];
-    private static double[] OutcomeValues => [82, 12, 6];
-    private static string[] OutcomeColors => ["#70ad47", "#ed7d31", "#a5a5a5"];
+    private string[] RegionLabels => FilteredSnapshots
+        .GroupBy(snapshot => snapshot.Region)
+        .OrderBy(group => group.Key)
+        .Select(group => group.Key)
+        .ToArray();
 
-    private static string[] TestTypeLabels => TestTypeData.Select(testType => testType.Name).ToArray();
-    private static double[] TestTypeValues => TestTypeData.Select(testType => (double)testType.AverageMinutes).ToArray();
-    private static string[] TestTypeColors => ["#264478", "#4472c4", "#5b9bd5", "#70ad47", "#ffc000"];
+    private double[] RegionValues => FilteredSnapshots
+        .GroupBy(snapshot => snapshot.Region)
+        .OrderBy(group => group.Key)
+        .Select(group => (double)group.Sum(snapshot => snapshot.Completed))
+        .ToArray();
+
+    private string[] RegionColors => RegionLabels
+        .Select((_, index) => RegionPalette[index % RegionPalette.Length])
+        .ToArray();
+
+    private double[] OutcomeValues
+    {
+        get
+        {
+            var snapshots = FilteredSnapshots.ToList();
+            return
+            [
+                snapshots.Sum(snapshot => snapshot.Pass),
+                snapshots.Sum(snapshot => snapshot.Fail),
+                snapshots.Sum(snapshot => snapshot.NotApplicable)
+            ];
+        }
+    }
+
+    private double[] TestTypeValues
+    {
+        get
+        {
+            var snapshots = FilteredSnapshots.ToList();
+            if (snapshots.Count == 0)
+            {
+                return [0, 0, 0, 0, 0];
+            }
+
+            return
+            [
+                Math.Round(snapshots.Average(snapshot => snapshot.ElectricalSafetyMinutes), 1),
+                Math.Round(snapshots.Average(snapshot => snapshot.FunctionalMinutes), 1),
+                Math.Round(snapshots.Average(snapshot => snapshot.CalibrationMinutes), 1),
+                Math.Round(snapshots.Average(snapshot => snapshot.VisualInspectionMinutes), 1),
+                Math.Round(snapshots.Average(snapshot => snapshot.LeakTestMinutes), 1)
+            ];
+        }
+    }
+
+    private static double ComputeWeightedAverageMinutes(IReadOnlyList<PerformanceSnapshot> snapshots)
+    {
+        if (snapshots.Count == 0)
+        {
+            return 0;
+        }
+
+        var totalCompleted = snapshots.Sum(snapshot => snapshot.Completed);
+        if (totalCompleted == 0)
+        {
+            return 0;
+        }
+
+        var weightedDurationSum = snapshots.Sum(snapshot => snapshot.Completed *
+            (snapshot.ElectricalSafetyMinutes + snapshot.FunctionalMinutes + snapshot.CalibrationMinutes + snapshot.VisualInspectionMinutes + snapshot.LeakTestMinutes) / 5.0);
+
+        return weightedDurationSum / totalCompleted;
+    }
 
     private sealed record KpiMetric(string Label, string Value, string ThemeClass, string IconPath);
-    private sealed record RegionMetric(string Name, int Completed);
-    private sealed record TestTypeMetric(string Name, int AverageMinutes);
+
+    private sealed record PerformanceSnapshot(
+        string Window,
+        string Region,
+        string Owner,
+        int Completed,
+        int Pass,
+        int Fail,
+        int NotApplicable,
+        int ElectricalSafetyMinutes,
+        int FunctionalMinutes,
+        int CalibrationMinutes,
+        int VisualInspectionMinutes,
+        int LeakTestMinutes,
+        int Overdue,
+        int Unassigned);
 }
