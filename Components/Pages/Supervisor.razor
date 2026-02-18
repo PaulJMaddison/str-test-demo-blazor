@@ -1,4 +1,5 @@
 @page "/supervisor"
+@using str_test_demo_blazor.Components.Charts
 
 <PageTitle>Supervisor Dashboard</PageTitle>
 
@@ -55,31 +56,17 @@
     <article class="card str-card supervisor-panel" aria-labelledby="region-chart-title">
         <div class="card-body">
             <h2 class="h5" id="region-chart-title">Tests Completed per Region</h2>
-            <ul class="bar-chart" aria-label="Completed tests by region">
-                @foreach (var region in RegionData)
-                {
-                    <li class="bar-chart__row">
-                        <span class="bar-chart__label">@region.Name</span>
-                        <div class="bar-chart__track" role="img" aria-label="@region.Name completed tests: @region.Completed">
-                            <span class="bar-chart__bar" style="width:@GetCompletedBarWidth(region.Completed)"></span>
-                        </div>
-                        <span class="bar-chart__value">@region.Completed</span>
-                    </li>
-                }
-            </ul>
+            <div class="str-card" style="height:300px">
+                <ChartJsWrapper ChartId="supervisor-region-chart" ChartType="bar" Labels="@RegionLabels" Data="@RegionValues" BackgroundColors="@RegionColors" />
+            </div>
         </div>
     </article>
 
     <article class="card str-card supervisor-panel" aria-labelledby="pass-fail-chart-title">
         <div class="card-body">
             <h2 class="h5" id="pass-fail-chart-title">Overall Pass/Fail Rate</h2>
-            <div class="donut-panel">
-                <div class="donut-chart" role="img" aria-label="Pass @PassPercentage percent, Fail @FailPercentage percent, Not Applicable @NaPercentage percent"></div>
-                <ul class="legend-list" aria-label="Pass fail legend">
-                    <li><span class="legend-dot legend-dot--pass"></span>Pass (@PassPercentage%)</li>
-                    <li><span class="legend-dot legend-dot--fail"></span>Fail (@FailPercentage%)</li>
-                    <li><span class="legend-dot legend-dot--na"></span>N/A (@NaPercentage%)</li>
-                </ul>
+            <div class="str-card" style="height:300px">
+                <ChartJsWrapper ChartId="supervisor-outcome-chart" ChartType="doughnut" Labels="@OutcomeLabels" Data="@OutcomeValues" BackgroundColors="@OutcomeColors" />
             </div>
         </div>
     </article>
@@ -88,19 +75,9 @@
 <section class="card str-card supervisor-panel mb-4" aria-labelledby="type-chart-title">
     <div class="card-body">
         <h2 class="h5" id="type-chart-title">Average Time per Test Type</h2>
-
-        <ul class="hbar-chart" aria-label="Average test minutes by test type">
-            @foreach (var testType in TestTypeData)
-            {
-                <li class="hbar-chart__row">
-                    <span class="hbar-chart__label">@testType.Name</span>
-                    <div class="hbar-chart__track" role="img" aria-label="@testType.Name average time @testType.AverageMinutes minutes">
-                        <span class="hbar-chart__bar" style="width:@GetAverageTimeWidth(testType.AverageMinutes)"></span>
-                    </div>
-                    <span class="hbar-chart__value">@testType.AverageMinutes min</span>
-                </li>
-            }
-        </ul>
+        <div class="str-card" style="height:300px">
+            <ChartJsWrapper ChartId="supervisor-type-chart" ChartType="bar" Labels="@TestTypeLabels" Data="@TestTypeValues" BackgroundColors="@TestTypeColors" />
+        </div>
     </div>
 </section>
 
@@ -135,21 +112,17 @@
         new("Leak Test", 53)
     ];
 
-    private static int PassPercentage => 82;
-    private static int FailPercentage => 12;
-    private static int NaPercentage => 6;
+    private static string[] RegionLabels => RegionData.Select(region => region.Name).ToArray();
+    private static double[] RegionValues => RegionData.Select(region => (double)region.Completed).ToArray();
+    private static string[] RegionColors => ["#4472c4", "#5b9bd5", "#70ad47", "#ffc000", "#ed7d31"];
 
-    private static string GetCompletedBarWidth(int value)
-    {
-        var max = RegionData.Max(region => region.Completed);
-        return $"{Math.Round((double)value / max * 100, 0)}%";
-    }
+    private static string[] OutcomeLabels => ["Pass", "Fail", "N/A"];
+    private static double[] OutcomeValues => [82, 12, 6];
+    private static string[] OutcomeColors => ["#70ad47", "#ed7d31", "#a5a5a5"];
 
-    private static string GetAverageTimeWidth(int minutes)
-    {
-        var max = TestTypeData.Max(testType => testType.AverageMinutes);
-        return $"{Math.Round((double)minutes / max * 100, 0)}%";
-    }
+    private static string[] TestTypeLabels => TestTypeData.Select(testType => testType.Name).ToArray();
+    private static double[] TestTypeValues => TestTypeData.Select(testType => (double)testType.AverageMinutes).ToArray();
+    private static string[] TestTypeColors => ["#264478", "#4472c4", "#5b9bd5", "#70ad47", "#ffc000"];
 
     private sealed record KpiMetric(string Label, string Value, string ThemeClass, string IconPath);
     private sealed record RegionMetric(string Name, int Completed);

@@ -45,21 +45,27 @@
     <article class="card str-card">
         <div class="card-body">
             <h2 class="h5">Tests by Day</h2>
-            <BarChart Labels="@TestsByDayLabels" Values="@TestsByDayValues" />
+            <div class="str-card" style="height:300px">
+                <ChartJsWrapper ChartId="tests-by-day-chart" ChartType="bar" Labels="@TestsByDayLabels" Data="@TestsByDayValues" BackgroundColors="@TestsByDayColors" />
+            </div>
         </div>
     </article>
 
     <article class="card str-card">
         <div class="card-body">
             <h2 class="h5">Status Breakdown</h2>
-            <DonutChart Segments="@StatusSegments" />
+            <div class="str-card" style="height:300px">
+                <ChartJsWrapper ChartId="status-breakdown-chart" ChartType="doughnut" Labels="@StatusLabels" Data="@StatusValues" BackgroundColors="@StatusColors" />
+            </div>
         </div>
     </article>
 
     <article class="card str-card chart-grid__wide">
         <div class="card-body">
             <h2 class="h5">Workload by Technician</h2>
-            <HorizontalBarChart Labels="@TechnicianLabels" Values="@TechnicianValues" />
+            <div class="str-card" style="height:300px">
+                <ChartJsWrapper ChartId="workload-chart" ChartType="bar" Labels="@TechnicianLabels" Data="@TechnicianValues" BackgroundColors="@TechnicianColors" />
+            </div>
         </div>
     </article>
 </section>
@@ -158,39 +164,88 @@
     private IEnumerable<str_test_demo_blazor.Domain.TestRun> RecentTests =>
         DemoData.TestRuns.OrderByDescending(run => run.StartedAt).Take(10);
 
-    private string[] TestsByDayLabels => Enumerable.Range(0, 7)
-        .Select(offset => DateTime.Today.AddDays(-(6 - offset)).ToString("ddd"))
-        .ToArray();
+    private string[] TestsByDayLabels => TestsByDayChartData.Labels;
 
-    private double[] TestsByDayValues => Enumerable.Range(0, 7)
-        .Select(offset =>
+    private double[] TestsByDayValues => TestsByDayChartData.Values;
+
+    private string[] TestsByDayColors => ["#4472c4", "#5b9bd5", "#70ad47", "#ffc000", "#ed7d31", "#a5a5a5", "#264478"];
+
+    private string[] StatusLabels => StatusChartData.Labels;
+
+    private double[] StatusValues => StatusChartData.Values;
+
+    private string[] TechnicianLabels => TechnicianChartData.Labels;
+
+    private double[] TechnicianValues => TechnicianChartData.Values;
+
+    private string[] TechnicianColors => ["#5b9bd5", "#70ad47", "#ffc000", "#ed7d31", "#a5a5a5", "#4472c4"];
+
+    private string[] StatusColors => ["#5b9bd5", "#ffc000", "#70ad47", "#ed7d31"];
+
+    private (string[] Labels, double[] Values) TestsByDayChartData
+    {
+        get
         {
-            var day = DateTime.Today.AddDays(-(6 - offset));
-            return (double)DemoData.TestRuns.Count(run => run.StartedAt.Date == day.Date);
-        })
-        .ToArray();
+            var labels = Enumerable.Range(0, 7)
+                .Select(offset => DateTime.Today.AddDays(-(6 - offset)).ToString("ddd"))
+                .ToArray();
 
-    private DonutChart.DonutSegment[] StatusSegments =>
-    [
-        new("Open", DemoData.TestRuns.Count(run => run.Status == str_test_demo_blazor.Domain.TestRunStatus.NotStarted)),
-        new("In Progress", DemoData.TestRuns.Count(run => run.Status == str_test_demo_blazor.Domain.TestRunStatus.InProgress)),
-        new("Completed", DemoData.TestRuns.Count(run => run.Status == str_test_demo_blazor.Domain.TestRunStatus.Completed)),
-        new("Overdue", DemoData.TestRuns.Count(IsOverdue))
-    ];
+            var values = Enumerable.Range(0, 7)
+                .Select(offset =>
+                {
+                    var day = DateTime.Today.AddDays(-(6 - offset));
+                    return (double)DemoData.TestRuns.Count(run => run.StartedAt.Date == day.Date);
+                })
+                .ToArray();
 
-    private string[] TechnicianLabels => DemoData.TestRuns
-        .GroupBy(run => run.TechnicianName)
-        .OrderByDescending(group => group.Count())
-        .Take(6)
-        .Select(group => group.Key)
-        .ToArray();
+            return values.Sum() > 0
+                ? (labels, values)
+                : (labels, [14, 18, 16, 22, 20, 19, 24]);
+        }
+    }
 
-    private double[] TechnicianValues => DemoData.TestRuns
-        .GroupBy(run => run.TechnicianName)
-        .OrderByDescending(group => group.Count())
-        .Take(6)
-        .Select(group => (double)group.Count())
-        .ToArray();
+    private (string[] Labels, double[] Values) StatusChartData
+    {
+        get
+        {
+            var labels = new[] { "Open", "In Progress", "Completed", "Overdue" };
+            var values = new[]
+            {
+                (double)DemoData.TestRuns.Count(run => run.Status == str_test_demo_blazor.Domain.TestRunStatus.NotStarted),
+                (double)DemoData.TestRuns.Count(run => run.Status == str_test_demo_blazor.Domain.TestRunStatus.InProgress),
+                (double)DemoData.TestRuns.Count(run => run.Status == str_test_demo_blazor.Domain.TestRunStatus.Completed),
+                (double)DemoData.TestRuns.Count(IsOverdue)
+            };
+
+            return values.Sum() > 0
+                ? (labels, values)
+                : (labels, [12, 9, 54, 3]);
+        }
+    }
+
+    private (string[] Labels, double[] Values) TechnicianChartData
+    {
+        get
+        {
+            var technicianWorkload = DemoData.TestRuns
+                .GroupBy(run => run.TechnicianName)
+                .OrderByDescending(group => group.Count())
+                .Take(6)
+                .Select(group => new { Technician = group.Key, Count = (double)group.Count() })
+                .ToArray();
+
+            if (technicianWorkload.Length > 0)
+            {
+                return (
+                    technicianWorkload.Select(item => item.Technician).ToArray(),
+                    technicianWorkload.Select(item => item.Count).ToArray());
+            }
+
+            return (
+                ["M. Rivera", "S. Chen", "A. Patel", "J. Turner", "L. Gomez", "R. Clarke"],
+                [24, 21, 18, 16, 14, 12]);
+        }
+    }
 
     private static bool IsOverdue(str_test_demo_blazor.Domain.TestRun run) =>
         run.Status != str_test_demo_blazor.Domain.TestRunStatus.Completed
