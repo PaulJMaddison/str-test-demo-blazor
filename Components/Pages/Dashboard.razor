@@ -1,5 +1,6 @@
 @page "/dashboard"
 @inject str_test_demo_blazor.Services.DemoDataService DemoData
+@using str_test_demo_blazor.Components.Charts
 
 <PageTitle>Dashboard</PageTitle>
 
@@ -37,6 +38,29 @@
         </div>
         <p class="metric-card__label">Avg Completion Time</p>
         <p class="metric-card__value">@AverageCompletionTimeDisplay</p>
+    </article>
+</section>
+
+<section class="chart-grid mb-4" aria-label="Supervisor dashboard charts">
+    <article class="card str-card">
+        <div class="card-body">
+            <h2 class="h5">Tests by Day</h2>
+            <BarChart Labels="@TestsByDayLabels" Values="@TestsByDayValues" />
+        </div>
+    </article>
+
+    <article class="card str-card">
+        <div class="card-body">
+            <h2 class="h5">Status Breakdown</h2>
+            <DonutChart Segments="@StatusSegments" />
+        </div>
+    </article>
+
+    <article class="card str-card chart-grid__wide">
+        <div class="card-body">
+            <h2 class="h5">Workload by Technician</h2>
+            <HorizontalBarChart Labels="@TechnicianLabels" Values="@TechnicianValues" />
+        </div>
     </article>
 </section>
 
@@ -133,6 +157,40 @@
 
     private IEnumerable<str_test_demo_blazor.Domain.TestRun> RecentTests =>
         DemoData.TestRuns.OrderByDescending(run => run.StartedAt).Take(10);
+
+    private string[] TestsByDayLabels => Enumerable.Range(0, 7)
+        .Select(offset => DateTime.Today.AddDays(-(6 - offset)).ToString("ddd"))
+        .ToArray();
+
+    private double[] TestsByDayValues => Enumerable.Range(0, 7)
+        .Select(offset =>
+        {
+            var day = DateTime.Today.AddDays(-(6 - offset));
+            return (double)DemoData.TestRuns.Count(run => run.StartedAt.Date == day.Date);
+        })
+        .ToArray();
+
+    private DonutChart.DonutSegment[] StatusSegments =>
+    [
+        new("Open", DemoData.TestRuns.Count(run => run.Status == str_test_demo_blazor.Domain.TestRunStatus.NotStarted)),
+        new("In Progress", DemoData.TestRuns.Count(run => run.Status == str_test_demo_blazor.Domain.TestRunStatus.InProgress)),
+        new("Completed", DemoData.TestRuns.Count(run => run.Status == str_test_demo_blazor.Domain.TestRunStatus.Completed)),
+        new("Overdue", DemoData.TestRuns.Count(IsOverdue))
+    ];
+
+    private string[] TechnicianLabels => DemoData.TestRuns
+        .GroupBy(run => run.TechnicianName)
+        .OrderByDescending(group => group.Count())
+        .Take(6)
+        .Select(group => group.Key)
+        .ToArray();
+
+    private double[] TechnicianValues => DemoData.TestRuns
+        .GroupBy(run => run.TechnicianName)
+        .OrderByDescending(group => group.Count())
+        .Take(6)
+        .Select(group => (double)group.Count())
+        .ToArray();
 
     private static bool IsOverdue(str_test_demo_blazor.Domain.TestRun run) =>
         run.Status != str_test_demo_blazor.Domain.TestRunStatus.Completed

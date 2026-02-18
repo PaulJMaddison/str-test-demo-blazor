@@ -1,0 +1,84 @@
+@using System.Globalization
+
+<div class="chart-card" role="img" aria-label="Bar chart">
+    <svg class="chart-svg" viewBox="0 0 @Width @Height" preserveAspectRatio="xMidYMid meet">
+        <line x1="@PaddingLeft" y1="@ChartBottom" x2="@(Width - PaddingRight)" y2="@ChartBottom" class="chart-axis" />
+        <line x1="@PaddingLeft" y1="@PaddingTop" x2="@PaddingLeft" y2="@ChartBottom" class="chart-axis" />
+
+        @foreach (var bar in Bars)
+        {
+            <rect x="@bar.X.ToString("0.##", CultureInfo.InvariantCulture)"
+                  y="@bar.Y.ToString("0.##", CultureInfo.InvariantCulture)"
+                  width="@bar.Width.ToString("0.##", CultureInfo.InvariantCulture)"
+                  height="@bar.Height.ToString("0.##", CultureInfo.InvariantCulture)"
+                  rx="4"
+                  class="chart-bar" />
+
+            <svg:text x="@bar.CenterX.ToString("0.##", CultureInfo.InvariantCulture)"
+                  y="@(ChartBottom + 18)"
+                  text-anchor="middle"
+                  class="chart-label">@bar.Label</svg:text>
+        }
+    </svg>
+</div>
+
+@code {
+    [Parameter, EditorRequired] public string[] Labels { get; set; } = Array.Empty<string>();
+    [Parameter, EditorRequired] public double[] Values { get; set; } = Array.Empty<double>();
+    [Parameter] public double? MaxValue { get; set; }
+
+    private const double Width = 600;
+    private const double Height = 280;
+    private const double PaddingLeft = 42;
+    private const double PaddingRight = 16;
+    private const double PaddingTop = 20;
+    private const double PaddingBottom = 50;
+    private double ChartBottom => Height - PaddingBottom;
+
+    private IReadOnlyList<BarEntry> Bars
+    {
+        get
+        {
+            var count = Math.Min(Labels.Length, Values.Length);
+            if (count == 0)
+            {
+                return Array.Empty<BarEntry>();
+            }
+
+            var max = ResolveMax(count);
+            var chartWidth = Width - PaddingLeft - PaddingRight;
+            var slotWidth = chartWidth / count;
+            var barWidth = Math.Max(8, slotWidth * 0.62);
+            var chartHeight = ChartBottom - PaddingTop;
+
+            return Enumerable.Range(0, count)
+                .Select(index =>
+                {
+                    var value = Math.Max(0, Values[index]);
+                    var barHeight = max <= 0 ? 0 : value / max * chartHeight;
+                    var centerX = PaddingLeft + slotWidth * index + slotWidth / 2;
+
+                    return new BarEntry(
+                        Labels[index],
+                        centerX - barWidth / 2,
+                        ChartBottom - barHeight,
+                        barWidth,
+                        barHeight,
+                        centerX);
+                })
+                .ToArray();
+        }
+    }
+
+    private double ResolveMax(int count)
+    {
+        if (MaxValue.HasValue && MaxValue.Value > 0)
+        {
+            return MaxValue.Value;
+        }
+
+        return Values.Take(count).DefaultIfEmpty(1).Max();
+    }
+
+    private sealed record BarEntry(string Label, double X, double Y, double Width, double Height, double CenterX);
+}

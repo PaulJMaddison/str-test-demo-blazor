@@ -1,0 +1,89 @@
+@using System.Globalization
+
+<div class="donut-layout" role="img" aria-label="Donut chart">
+    <svg class="donut-svg" viewBox="0 0 240 240" preserveAspectRatio="xMidYMid meet">
+        <circle cx="120" cy="120" r="80" class="donut-track" />
+
+        @foreach (var segment in SegmentSlices)
+        {
+            <circle cx="120"
+                    cy="120"
+                    r="80"
+                    class="donut-slice"
+                    stroke="@segment.Color"
+                    stroke-dasharray="@segment.DashArray"
+                    stroke-dashoffset="@segment.DashOffset" />
+        }
+
+        <svg:text x="120" y="116" text-anchor="middle" class="donut-total-label">Total</svg:text>
+        <svg:text x="120" y="136" text-anchor="middle" class="donut-total-value">@TotalValue.ToString("0")</svg:text>
+    </svg>
+
+    <ul class="donut-legend" aria-label="Chart legend">
+        @foreach (var segment in SegmentSlices)
+        {
+            <li class="donut-legend__item">
+                <span class="donut-legend__swatch" style="background-color:@segment.Color"></span>
+                <span>@segment.Label</span>
+                <strong>@segment.Value.ToString("0.#", CultureInfo.InvariantCulture)</strong>
+            </li>
+        }
+    </ul>
+</div>
+
+@code {
+    [Parameter, EditorRequired] public IEnumerable<DonutSegment> Segments { get; set; } = Array.Empty<DonutSegment>();
+
+    private static readonly string[] Colors =
+    [
+        "var(--str-primary, #3b82f6)",
+        "var(--str-accent, #0ea5e9)",
+        "#22c55e",
+        "#f59e0b",
+        "#ef4444"
+    ];
+
+    private double TotalValue => Segments.Select(x => Math.Max(0, x.Value)).Sum();
+
+    private IReadOnlyList<SegmentSlice> SegmentSlices
+    {
+        get
+        {
+            var normalized = Segments
+                .Select((segment, index) => new
+                {
+                    segment.Label,
+                    Value = Math.Max(0, segment.Value),
+                    Color = Colors[index % Colors.Length]
+                })
+                .Where(segment => segment.Value > 0)
+                .ToList();
+
+            var total = normalized.Sum(x => x.Value);
+            if (total <= 0)
+            {
+                return Array.Empty<SegmentSlice>();
+            }
+
+            const double circumference = 2 * Math.PI * 80;
+            var used = 0d;
+
+            return normalized.Select(segment =>
+            {
+                var length = segment.Value / total * circumference;
+                var slice = new SegmentSlice(
+                    segment.Label,
+                    segment.Value,
+                    segment.Color,
+                    $"{length.ToString("0.##", CultureInfo.InvariantCulture)} {circumference.ToString("0.##", CultureInfo.InvariantCulture)}",
+                    (-used).ToString("0.##", CultureInfo.InvariantCulture));
+                used += length;
+                return slice;
+            }).ToArray();
+        }
+    }
+
+    public sealed record DonutSegment(string Label, double Value);
+
+    private sealed record SegmentSlice(string Label, double Value, string Color, string DashArray, string DashOffset);
+}

@@ -1,0 +1,18 @@
+.hbar-card {
+    width: 100%;
+}
+
+.hbar-svg {
+    width: 100%;
+    height: auto;
+    display: block;
+}
+
+.hbar-label {
+    fill: var(--str-text-muted, #64748b);
+    font-size: 12px;
+}
+
+.hbar-bar {
+    fill: var(--str-primary, #3b82f6);
+}
