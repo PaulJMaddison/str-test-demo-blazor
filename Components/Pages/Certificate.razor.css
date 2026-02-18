@@ -13,10 +13,76 @@
 }
 
 .certificate-photo {
-    width: 160px;
-    height: 120px;
+    width: 100%;
+    aspect-ratio: 3 / 2;
     object-fit: cover;
     background-color: #fff;
+}
+
+.certificate-photo-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 0.75rem;
+}
+
+.certificate-photo-button {
+    border: 0;
+    background: transparent;
+    padding: 0;
+    text-align: left;
+    cursor: pointer;
+}
+
+.certificate-photo-button .certificate-photo {
+    transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+.certificate-photo-button:hover .certificate-photo,
+.certificate-photo-button:focus-visible .certificate-photo {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 18px rgba(21, 33, 48, 0.22);
+}
+
+.certificate-photo-modal {
+    position: fixed;
+    inset: 0;
+    z-index: 1050;
+    background: rgba(11, 17, 24, 0.76);
+    display: grid;
+    place-items: center;
+    padding: 1.25rem;
+}
+
+.certificate-photo-modal-card {
+    max-width: 980px;
+    width: 100%;
+    position: relative;
+}
+
+.certificate-photo-modal-close {
+    position: absolute;
+    top: 0.75rem;
+    right: 0.75rem;
+    z-index: 1;
+}
+
+.certificate-photo-preview {
+    width: 100%;
+    border-radius: 0.5rem;
+    border: 1px solid rgba(255, 255, 255, 0.28);
+    background: #0f1722;
+}
+
+@media (min-width: 768px) {
+    .certificate-photo-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+}
+
+@media (min-width: 1200px) {
+    .certificate-photo-grid {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
 }
 
 @media print {

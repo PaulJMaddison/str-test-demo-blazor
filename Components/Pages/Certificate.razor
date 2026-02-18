@@ -91,24 +91,34 @@ else
 
             <section>
                 <h3 class="h6 text-uppercase text-muted">Photo Thumbnails</h3>
-                @if (PhotoPaths.Count == 0)
+                @if (AssetPhotoGalleryPaths.Count == 0)
                 {
                     <p class="text-muted mb-0">No photos attached.</p>
                 }
                 else
                 {
-                    <div class="d-flex flex-wrap gap-3">
-                        @foreach (var path in PhotoPaths)
+                    <div class="certificate-photo-grid">
+                        @foreach (var path in AssetPhotoGalleryPaths)
                         {
-                            <figure class="mb-0">
-                                <img class="certificate-photo border rounded" src="@ToWebPath(path)" alt="Task photo placeholder" />
-                            </figure>
+                            <button class="certificate-photo-button" type="button" @onclick="() => OpenPhoto(path)">
+                                <img class="certificate-photo border rounded" src="@ToWebPath(path)" alt="Asset photo placeholder" />
+                            </button>
                         }
                     </div>
                 }
             </section>
         </div>
     </article>
+
+    @if (_activePhotoPath is not null)
+    {
+        <div class="certificate-photo-modal" role="dialog" aria-modal="true" @onclick="ClosePhoto">
+            <div class="certificate-photo-modal-card" @onclick:stopPropagation="true">
+                <button class="btn btn-sm btn-outline-light certificate-photo-modal-close" type="button" @onclick="ClosePhoto">Close</button>
+                <img class="certificate-photo-preview" src="@ToWebPath(_activePhotoPath)" alt="Expanded asset photo" />
+            </div>
+        </div>
+    }
 }
 
 @code {
@@ -118,16 +128,34 @@ else
     private str_test_demo_blazor.Domain.TestRun? _testRun;
     private str_test_demo_blazor.Domain.Asset? _asset;
     private str_test_demo_blazor.Domain.TestTemplate? _template;
+    private string? _activePhotoPath;
 
     private int PassCount => _testRun?.TestTaskRuns.Count(task => task.Result == str_test_demo_blazor.Domain.TestTaskResult.Pass) ?? 0;
     private int FailCount => _testRun?.TestTaskRuns.Count(task => task.Result == str_test_demo_blazor.Domain.TestTaskResult.Fail) ?? 0;
     private int NaCount => _testRun?.TestTaskRuns.Count(task => task.Result == str_test_demo_blazor.Domain.TestTaskResult.NA) ?? 0;
 
-    private IReadOnlyList<string> PhotoPaths =>
-        _testRun?.TestTaskRuns
-            .SelectMany(task => task.PhotoSvgPaths)
-            .Distinct()
-            .ToList() ?? [];
+    private IReadOnlyList<string> AssetPhotoGalleryPaths
+    {
+        get
+        {
+            if (_asset is null)
+            {
+                return [];
+            }
+
+            var primaryPath = GetAssetPhotoPath(_asset);
+            var gallery = AssetPhotoCandidates.Where(path => path != primaryPath).Prepend(primaryPath).ToList();
+            return gallery;
+        }
+    }
+
+    private static readonly IReadOnlyList<string> AssetPhotoCandidates =
+    [
+        "demo-images/asset-photos/asset-hydraulic-press.svg",
+        "demo-images/asset-photos/asset-crane-assembly.svg",
+        "demo-images/asset-photos/asset-compressor-unit.svg",
+        "demo-images/asset-photos/asset-power-panel.svg"
+    ];
 
     protected override void OnParametersSet()
     {
@@ -146,6 +174,39 @@ else
     }
 
     private async Task Print() => await Js.InvokeVoidAsync("print");
+
+    private static string GetAssetPhotoPath(str_test_demo_blazor.Domain.Asset asset)
+    {
+        var type = asset.Type ?? string.Empty;
+
+        if (type.Contains("Hydraulic", StringComparison.OrdinalIgnoreCase) || asset.AssetTag.StartsWith("HYD", StringComparison.OrdinalIgnoreCase))
+        {
+            return "demo-images/asset-photos/asset-hydraulic-press.svg";
+        }
+
+        if (type.Contains("Crane", StringComparison.OrdinalIgnoreCase) || asset.AssetTag.StartsWith("CRN", StringComparison.OrdinalIgnoreCase))
+        {
+            return "demo-images/asset-photos/asset-crane-assembly.svg";
+        }
+
+        if (type.Contains("Compressor", StringComparison.OrdinalIgnoreCase) || asset.AssetTag.StartsWith("CMP", StringComparison.OrdinalIgnoreCase))
+        {
+            return "demo-images/asset-photos/asset-compressor-unit.svg";
+        }
+
+        if (type.Contains("Power", StringComparison.OrdinalIgnoreCase)
+            || type.Contains("Control Panel", StringComparison.OrdinalIgnoreCase)
+            || asset.AssetTag.StartsWith("PWR", StringComparison.OrdinalIgnoreCase))
+        {
+            return "demo-images/asset-photos/asset-power-panel.svg";
+        }
+
+        return "demo-images/photo-placeholder-1.svg";
+    }
+
+    private void OpenPhoto(string path) => _activePhotoPath = path;
+
+    private void ClosePhoto() => _activePhotoPath = null;
 
     private static string ToWebPath(string path) => path.StartsWith('/') ? path : $"/{path}";
 }
