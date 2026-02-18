@@ -1,0 +1,67 @@
+.donut-layout {
+    display: grid;
+    grid-template-columns: minmax(140px, 220px) 1fr;
+    align-items: center;
+    gap: 1rem;
+}
+
+.donut-svg {
+    width: 100%;
+    height: auto;
+}
+
+.donut-track,
+.donut-slice {
+    fill: none;
+    stroke-width: 30;
+    transform: rotate(-90deg);
+    transform-origin: center;
+}
+
+.donut-track {
+    stroke: var(--str-border-color, #e2e8f0);
+}
+
+.donut-slice {
+    stroke-linecap: butt;
+}
+
+.donut-total-label {
+    fill: var(--str-text-muted, #64748b);
+    font-size: 11px;
+}
+
+.donut-total-value {
+    fill: var(--str-text-color, #0f172a);
+    font-size: 18px;
+    font-weight: 700;
+}
+
+.donut-legend {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    gap: 0.45rem;
+}
+
+.donut-legend__item {
+    display: grid;
+    grid-template-columns: 12px 1fr auto;
+    gap: 0.5rem;
+    align-items: center;
+    color: var(--str-text-color, #0f172a);
+    font-size: 0.9rem;
+}
+
+.donut-legend__swatch {
+    width: 12px;
+    height: 12px;
+    border-radius: 2px;
+}
+
+@media (max-width: 640px) {
+    .donut-layout {
+        grid-template-columns: 1fr;
+    }
+}

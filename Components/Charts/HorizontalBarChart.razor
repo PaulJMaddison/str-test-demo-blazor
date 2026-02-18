@@ -1,0 +1,57 @@
+@using System.Globalization
+
+<div class="hbar-card" role="img" aria-label="Horizontal bar chart">
+    <svg class="hbar-svg" viewBox="0 0 @Width @ChartHeight" preserveAspectRatio="xMidYMid meet">
+        @foreach (var bar in Bars)
+        {
+            <svg:text x="@(LabelColumn - 10)"
+                  y="@bar.TextY.ToString("0.##", CultureInfo.InvariantCulture)"
+                  text-anchor="end"
+                  class="hbar-label">@bar.Label</svg:text>
+
+            <rect x="@LabelColumn"
+                  y="@bar.Y.ToString("0.##", CultureInfo.InvariantCulture)"
+                  width="@bar.Width.ToString("0.##", CultureInfo.InvariantCulture)"
+                  height="@BarHeight"
+                  rx="4"
+                  class="hbar-bar" />
+        }
+    </svg>
+</div>
+
+@code {
+    [Parameter, EditorRequired] public string[] Labels { get; set; } = Array.Empty<string>();
+    [Parameter, EditorRequired] public double[] Values { get; set; } = Array.Empty<double>();
+
+    private const double Width = 600;
+    private const double LabelColumn = 150;
+    private const double RowHeight = 32;
+    private const double BarHeight = 18;
+    private const double TopPadding = 12;
+    private double ChartHeight => TopPadding * 2 + Math.Max(1, Math.Min(Labels.Length, Values.Length)) * RowHeight;
+
+    private IReadOnlyList<HBarEntry> Bars
+    {
+        get
+        {
+            var count = Math.Min(Labels.Length, Values.Length);
+            if (count == 0)
+            {
+                return Array.Empty<HBarEntry>();
+            }
+
+            var max = Values.Take(count).DefaultIfEmpty(1).Max();
+            var usableWidth = Width - LabelColumn - 16;
+
+            return Enumerable.Range(0, count).Select(index =>
+            {
+                var value = Math.Max(0, Values[index]);
+                var width = max <= 0 ? 0 : value / max * usableWidth;
+                var y = TopPadding + index * RowHeight + (RowHeight - BarHeight) / 2;
+                return new HBarEntry(Labels[index], y, width, y + BarHeight - 4);
+            }).ToArray();
+        }
+    }
+
+    private sealed record HBarEntry(string Label, double Y, double Width, double TextY);
+}
