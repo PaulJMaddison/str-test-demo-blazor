@@ -1,55 +1,164 @@
 @page "/run-test"
 @page "/run-test/{TestId:guid}"
+@rendermode InteractiveServer
 @inject NavigationManager Navigation
 @inject str_test_demo_blazor.Services.DemoDataService DemoData
+@implements IDisposable
 
 <PageTitle>Run Test</PageTitle>
 
 <h1>Run Test</h1>
 <p class="text-muted">Demo-only test execution workflow with in-memory service data.</p>
 
-<section class="card shadow-sm mb-4">
-    <div class="card-body">
-        <h2 class="h5">Start Test</h2>
-        <div class="row g-3">
-            <div class="col-12 col-md-6">
-                <label class="form-label" for="asset-select">Asset</label>
-                <select id="asset-select" class="form-select" @bind="SelectedAssetId">
-                    @foreach (var asset in DemoData.Assets)
-                    {
-                        <option value="@asset.Id">@asset.AssetTag (@asset.Location)</option>
-                    }
-                </select>
-            </div>
-            <div class="col-12 col-md-6">
-                <label class="form-label" for="template-select">Template</label>
-                <select id="template-select" class="form-select" @bind="SelectedTemplateId">
-                    @foreach (var template in DemoData.Templates)
-                    {
-                        <option value="@template.Id">@template.Name</option>
-                    }
-                </select>
-            </div>
-            <div class="col-12">
-                <button class="btn btn-primary btn-lg" @onclick="StartTest">Start</button>
+@if (CurrentRun is null)
+{
+    <section class="card shadow-sm mb-4">
+        <div class="card-body">
+            <h2 class="h5">Start Test</h2>
+            <div class="row g-3">
+                <div class="col-12 col-md-6">
+                    <label class="form-label" for="asset-select">Asset</label>
+                    <select id="asset-select" class="form-select" @bind="SelectedAssetId">
+                        @foreach (var asset in DemoData.Assets)
+                        {
+                            <option value="@asset.Id">@asset.AssetTag (@asset.Location)</option>
+                        }
+                    </select>
+                </div>
+                <div class="col-12 col-md-6">
+                    <label class="form-label" for="template-select">Template</label>
+                    <select id="template-select" class="form-select" @bind="SelectedTemplateId">
+                        @foreach (var template in DemoData.Templates)
+                        {
+                            <option value="@template.Id">@template.Name</option>
+                        }
+                    </select>
+                </div>
+                <div class="col-12">
+                    <button class="btn btn-primary btn-lg" @onclick="StartTest">Start</button>
+                </div>
             </div>
         </div>
-    </div>
-</section>
-
-@if (CurrentRun is not null)
+    </section>
+}
+else
 {
     var asset = DemoData.FindAsset(CurrentRun.AssetId);
     var template = DemoData.FindTemplate(CurrentRun.TemplateId);
 
-    <section class="card shadow-sm">
-        <div class="card-body">
-            <h2 class="h5">Demo Test Session</h2>
-            <p class="mb-1"><strong>Test ID:</strong> @CurrentRun.Id</p>
-            <p class="mb-1"><strong>Asset:</strong> @asset?.AssetTag</p>
-            <p class="mb-1"><strong>Template:</strong> @template?.Name</p>
-            <p class="mb-1"><strong>Status:</strong> @CurrentRun.Status</p>
-            <p class="mb-0"><strong>Task Count:</strong> @CurrentRun.TestTaskRuns.Count</p>
+    <section class="card shadow-sm mb-4">
+        <div class="card-body d-flex flex-wrap justify-content-between gap-3 align-items-start">
+            <div>
+                <h2 class="h5 mb-3">Test Run Details</h2>
+                <p class="mb-1"><strong>Asset Tag:</strong> @asset?.AssetTag</p>
+                <p class="mb-1"><strong>Template Name:</strong> @template?.Name</p>
+                <p class="mb-0"><strong>Status:</strong> @CurrentRun.Status</p>
+            </div>
+            <div class="border rounded p-3 bg-light" style="min-width: 220px;">
+                <p class="text-uppercase text-muted small mb-1">Timer</p>
+                <p class="display-6 mb-2">@FormatElapsed(Elapsed)</p>
+                <div class="d-flex gap-2 flex-wrap">
+                    @if (!_timerStarted)
+                    {
+                        <button class="btn btn-sm btn-primary" @onclick="StartTimer">Start</button>
+                    }
+                    else if (_timerRunning)
+                    {
+                        <button class="btn btn-sm btn-outline-secondary" @onclick="PauseTimer">Pause</button>
+                    }
+                    else
+                    {
+                        <button class="btn btn-sm btn-primary" @onclick="ResumeTimer">Resume</button>
+                    }
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="row g-3 align-items-stretch">
+        <div class="col-12 col-lg-4">
+            <div class="card shadow-sm h-100">
+                <div class="card-body">
+                    <h2 class="h5">Tasks</h2>
+                    <div class="list-group">
+                        @foreach (var task in CurrentRun.TestTaskRuns)
+                        {
+                            var isSelected = task.Id == SelectedTaskId;
+                            <button type="button"
+                                    class="list-group-item list-group-item-action d-flex justify-content-between align-items-center @(isSelected ? "active" : string.Empty)"
+                                    @onclick="() => SelectTask(task.Id)">
+                                <span>@task.Title</span>
+                                <span class="badge rounded-pill text-bg-light text-dark">@task.Result</span>
+                            </button>
+                        }
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-12 col-lg-8">
+            <div class="card shadow-sm h-100">
+                <div class="card-body">
+                    @if (SelectedTask is null)
+                    {
+                        <p class="text-muted mb-0">Select a task to begin.</p>
+                    }
+                    else
+                    {
+                        <h2 class="h5 mb-3">@SelectedTask.Title</h2>
+
+                        <div class="mb-3">
+                            <p class="fw-semibold mb-2">Result</p>
+                            <div class="btn-group" role="group" aria-label="Task result">
+                                <button type="button" class="btn @(SelectedTask.Result == str_test_demo_blazor.Domain.TestTaskResult.Pass ? "btn-success" : "btn-outline-success")" @onclick="() => SetResult(str_test_demo_blazor.Domain.TestTaskResult.Pass)">Pass</button>
+                                <button type="button" class="btn @(SelectedTask.Result == str_test_demo_blazor.Domain.TestTaskResult.Fail ? "btn-danger" : "btn-outline-danger")" @onclick="() => SetResult(str_test_demo_blazor.Domain.TestTaskResult.Fail)">Fail</button>
+                                <button type="button" class="btn @(SelectedTask.Result == str_test_demo_blazor.Domain.TestTaskResult.NA ? "btn-secondary" : "btn-outline-secondary")" @onclick="() => SetResult(str_test_demo_blazor.Domain.TestTaskResult.NA)">N/A</button>
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label" for="task-comment">Comment</label>
+                            <textarea id="task-comment" class="form-control" rows="4" value="@SelectedTask.Comment" @oninput="UpdateComment"></textarea>
+                            <small class="text-muted">Comment autosaves to demo in-memory service.</small>
+                        </div>
+
+                        <div class="mb-3">
+                            <button type="button" class="btn btn-outline-primary" @onclick="AddPhoto">Add Photo (SVG)</button>
+                            @if (SelectedTask.PhotoSvgPaths.Count > 0)
+                            {
+                                <ul class="mt-2 ps-3 mb-0">
+                                    @foreach (var photoPath in SelectedTask.PhotoSvgPaths)
+                                    {
+                                        <li><a href="@photoPath" target="_blank">@photoPath</a></li>
+                                    }
+                                </ul>
+                            }
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label" for="minutes-spent">Minutes spent</label>
+                            <input id="minutes-spent" type="number" class="form-control" min="0" @bind="SelectedTask.MinutesSpent" />
+                        </div>
+                    }
+
+                    <hr />
+                    <div class="d-flex justify-content-between align-items-center flex-wrap gap-2">
+                        <div>
+                            <strong>Total Minutes:</strong> @CurrentRun.TotalMinutes
+                            @if (CurrentRun.CompletedAt is not null)
+                            {
+                                <span class="ms-3"><strong>Completed:</strong> @CurrentRun.CompletedAt.Value.ToString("g")</span>
+                            }
+                        </div>
+                        <button type="button"
+                                class="btn btn-success"
+                                disabled="@(CurrentRun.Status == str_test_demo_blazor.Domain.TestRunStatus.Completed)"
+                                @onclick="CompleteTest">
+                            Complete Test
+                        </button>
+                    </div>
+                </div>
+            </div>
         </div>
     </section>
 }
@@ -58,21 +167,144 @@
     [Parameter]
     public Guid? TestId { get; set; }
 
+    private readonly TimeSpan _tick = TimeSpan.FromSeconds(1);
+    private readonly List<DateTime> _pauseEvents = [];
+    private readonly string[] _photoPlaceholders =
+    [
+        "demo-images/photo-placeholder-1.svg",
+        "demo-images/photo-placeholder-2.svg",
+        "demo-images/camera-icon-placeholder.svg"
+    ];
+
     private Guid SelectedAssetId { get; set; }
     private Guid SelectedTemplateId { get; set; }
+    private Guid? SelectedTaskId { get; set; }
+
+    private System.Threading.Timer? _timer;
+    private TimeSpan _elapsedBeforeCurrentRun = TimeSpan.Zero;
+    private DateTime? _timerStartedAtUtc;
+    private bool _timerStarted;
+    private bool _timerRunning;
 
     private str_test_demo_blazor.Domain.TestRun? CurrentRun =>
         TestId is Guid id ? DemoData.TestRuns.FirstOrDefault(run => run.Id == id) : null;
+
+    private str_test_demo_blazor.Domain.TestTaskRun? SelectedTask =>
+        CurrentRun?.TestTaskRuns.FirstOrDefault(task => task.Id == SelectedTaskId);
+
+    private TimeSpan Elapsed =>
+        _timerRunning && _timerStartedAtUtc is not null
+            ? _elapsedBeforeCurrentRun + (DateTime.UtcNow - _timerStartedAtUtc.Value)
+            : _elapsedBeforeCurrentRun;
 
     protected override void OnInitialized()
     {
         SelectedAssetId = DemoData.Assets.First().Id;
         SelectedTemplateId = DemoData.Templates.First().Id;
+        _timer = new System.Threading.Timer(_ => InvokeAsync(StateHasChanged), null, _tick, _tick);
+    }
+
+    protected override void OnParametersSet()
+    {
+        if (CurrentRun is not null && (SelectedTaskId is null || CurrentRun.TestTaskRuns.All(task => task.Id != SelectedTaskId)))
+        {
+            SelectedTaskId = CurrentRun.TestTaskRuns.FirstOrDefault()?.Id;
+        }
     }
 
     private void StartTest()
     {
         var run = DemoData.CreateTestRun(SelectedAssetId, SelectedTemplateId);
         Navigation.NavigateTo($"/run-test/{run.Id}");
+    }
+
+    private void SelectTask(Guid taskId) => SelectedTaskId = taskId;
+
+    private void SetResult(str_test_demo_blazor.Domain.TestTaskResult result)
+    {
+        if (SelectedTask is null)
+        {
+            return;
+        }
+
+        SelectedTask.Result = result;
+    }
+
+    private void UpdateComment(ChangeEventArgs args)
+    {
+        if (SelectedTask is null)
+        {
+            return;
+        }
+
+        SelectedTask.Comment = args.Value?.ToString();
+    }
+
+    private void AddPhoto()
+    {
+        if (SelectedTask is null)
+        {
+            return;
+        }
+
+        var path = _photoPlaceholders[SelectedTask.PhotoSvgPaths.Count % _photoPlaceholders.Length];
+        SelectedTask.PhotoSvgPaths.Add(path);
+    }
+
+    private void StartTimer()
+    {
+        _timerStarted = true;
+        _timerRunning = true;
+        _timerStartedAtUtc = DateTime.UtcNow;
+
+        if (CurrentRun is not null)
+        {
+            CurrentRun.Status = str_test_demo_blazor.Domain.TestRunStatus.InProgress;
+        }
+    }
+
+    private void PauseTimer()
+    {
+        if (!_timerRunning || _timerStartedAtUtc is null)
+        {
+            return;
+        }
+
+        _elapsedBeforeCurrentRun += DateTime.UtcNow - _timerStartedAtUtc.Value;
+        _timerStartedAtUtc = null;
+        _timerRunning = false;
+        _pauseEvents.Add(DateTime.Now);
+    }
+
+    private void ResumeTimer()
+    {
+        _timerRunning = true;
+        _timerStarted = true;
+        _timerStartedAtUtc = DateTime.UtcNow;
+        _pauseEvents.Add(DateTime.Now);
+    }
+
+    private void CompleteTest()
+    {
+        if (CurrentRun is null)
+        {
+            return;
+        }
+
+        if (_timerRunning)
+        {
+            PauseTimer();
+        }
+
+        CurrentRun.Status = str_test_demo_blazor.Domain.TestRunStatus.Completed;
+        CurrentRun.CompletedAt = DateTime.Now;
+    }
+
+    private static string FormatElapsed(TimeSpan elapsed) =>
+        $"{(int)elapsed.TotalMinutes:00}:{elapsed.Seconds:00}";
+
+    public void Dispose()
+    {
+        _timer?.Dispose();
     }
 }

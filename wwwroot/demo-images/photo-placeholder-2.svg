@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="240" height="160" viewBox="0 0 240 160">
+  <rect width="240" height="160" fill="#f8f9fa" />
+  <polygon points="30,130 90,60 130,105 170,70 210,130" fill="#adb5bd" />
+  <circle cx="75" cy="48" r="16" fill="#ced4da" />
+  <text x="120" y="150" text-anchor="middle" font-family="Arial, sans-serif" font-size="14" fill="#495057">Photo Placeholder 2</text>
+</svg>
