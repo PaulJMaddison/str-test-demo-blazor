@@ -1,0 +1,222 @@
+@page "/expiring-certificates"
+
+<PageTitle>Upcoming Expiring Certificates</PageTitle>
+
+<h1>Upcoming Expiring Certificates</h1>
+<p class="text-muted">Demo-only certificate expiry tracker using in-memory records.</p>
+
+<section class="expiry-kpi-grid" aria-label="Expiry certificate KPI metrics">
+    <article class="expiry-kpi expiry-kpi--expired">
+        <p class="expiry-kpi__label">Expired</p>
+        <p class="expiry-kpi__value">@ExpiredCount</p>
+    </article>
+    <article class="expiry-kpi expiry-kpi--critical">
+        <p class="expiry-kpi__label">Critical (&lt;= 3 days)</p>
+        <p class="expiry-kpi__value">@CriticalCount</p>
+    </article>
+    <article class="expiry-kpi expiry-kpi--urgent">
+        <p class="expiry-kpi__label">Urgent (&lt;= 7 days)</p>
+        <p class="expiry-kpi__value">@UrgentCount</p>
+    </article>
+    <article class="expiry-kpi expiry-kpi--warning">
+        <p class="expiry-kpi__label">Warning (&lt;= 14 days)</p>
+        <p class="expiry-kpi__value">@WarningCount</p>
+    </article>
+</section>
+
+<section class="card str-card mb-4" aria-label="Expiry filters">
+    <div class="card-body expiry-filters">
+        <div class="filter-item">
+            <label class="form-label" for="region-filter">Region</label>
+            <select id="region-filter" class="form-select" @bind="SelectedRegion">
+                @foreach (var region in RegionOptions)
+                {
+                    <option value="@region">@region</option>
+                }
+            </select>
+        </div>
+
+        <div class="filter-item">
+            <label class="form-label" for="window-filter">Expiring within</label>
+            <select id="window-filter" class="form-select" @bind="SelectedWindowDays">
+                @foreach (var option in ExpiryWindowOptions)
+                {
+                    <option value="@option">@option days</option>
+                }
+            </select>
+        </div>
+    </div>
+</section>
+
+<section class="card str-card" aria-labelledby="expiring-certificates-table-title">
+    <div class="card-body">
+        <h2 class="h5" id="expiring-certificates-table-title">Certificates requiring attention</h2>
+        <div class="table-responsive">
+            <table class="table table-striped align-middle mb-0">
+                <thead>
+                    <tr>
+                        <th aria-label="Urgency indicator">&nbsp;</th>
+                        <th>Asset Number</th>
+                        <th>Test Type</th>
+                        <th>Asset Type</th>
+                        <th>Region</th>
+                        <th>Expiry Date</th>
+                        <th>Days Remaining</th>
+                        <th>Status</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @if (FilteredCertificates.Count == 0)
+                    {
+                        <tr>
+                            <td colspan="9" class="text-muted text-center py-4">No certificates found for the selected filters.</td>
+                        </tr>
+                    }
+                    else
+                    {
+                        @foreach (var cert in FilteredCertificates)
+                        {
+                            var urgency = GetUrgency(cert);
+                            <tr>
+                                <td>
+                                    <span class="urgency-dot @GetUrgencyDotClass(urgency)" title="@urgency" aria-label="@urgency"></span>
+                                </td>
+                                <td>@cert.AssetNumber</td>
+                                <td>@cert.TestType</td>
+                                <td>@cert.AssetType</td>
+                                <td>@cert.Region</td>
+                                <td>@cert.ExpiryDate.ToString("yyyy-MM-dd")</td>
+                                <td>@GetDaysRemaining(cert)</td>
+                                <td>
+                                    <span class="status-pill @GetStatusPillClass(urgency)">@urgency</span>
+                                </td>
+                                <td>
+                                    <button type="button" class="btn btn-outline-secondary btn-sm">Create Renewal</button>
+                                </td>
+                            </tr>
+                        }
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</section>
+
+@code {
+    private readonly List<int> ExpiryWindowOptions = new() { 7, 14, 30, 60 };
+
+    private readonly List<CertificateExpiry> Certificates = new()
+    {
+        new("A-10021", "Annual Safety", "Boiler", "North", DateTime.Today.AddDays(-2)),
+        new("A-10043", "Pressure Check", "Compressor", "South", DateTime.Today.AddDays(1)),
+        new("A-10087", "Electrical", "Generator", "East", DateTime.Today.AddDays(3)),
+        new("A-10112", "Calibration", "Lift", "West", DateTime.Today.AddDays(5)),
+        new("A-10144", "Hydraulic", "Crane", "North", DateTime.Today.AddDays(8)),
+        new("A-10155", "Load Test", "Hoist", "South", DateTime.Today.AddDays(12)),
+        new("A-10198", "Inspection", "Forklift", "Central", DateTime.Today.AddDays(20)),
+        new("A-10204", "Compliance", "Pump", "East", DateTime.Today.AddDays(27))
+    };
+
+    private string SelectedRegion { get; set; } = "All Regions";
+    private int SelectedWindowDays { get; set; } = 30;
+
+    private List<string> RegionOptions => new[] { "All Regions" }
+        .Concat(Certificates.Select(c => c.Region).Distinct().OrderBy(r => r))
+        .ToList();
+
+    private List<CertificateExpiry> FilteredCertificates => Certificates
+        .Where(c => SelectedRegion == "All Regions" || c.Region == SelectedRegion)
+        .Where(c => GetDaysRemaining(c) <= SelectedWindowDays)
+        .OrderBy(c => c.ExpiryDate)
+        .ToList();
+
+    private int ExpiredCount => Certificates.Count(c => GetDaysRemaining(c) < 0);
+    private int CriticalCount => Certificates.Count(c => GetDaysRemaining(c) >= 0 && GetDaysRemaining(c) <= 3);
+    private int UrgentCount => Certificates.Count(c => GetDaysRemaining(c) > 3 && GetDaysRemaining(c) <= 7);
+    private int WarningCount => Certificates.Count(c => GetDaysRemaining(c) > 7 && GetDaysRemaining(c) <= 14);
+
+    private static int GetDaysRemaining(CertificateExpiry certificate)
+    {
+        return (certificate.ExpiryDate.Date - DateTime.Today).Days;
+    }
+
+    private static string GetUrgency(CertificateExpiry certificate)
+    {
+        var daysRemaining = GetDaysRemaining(certificate);
+
+        if (daysRemaining < 0)
+        {
+            return "Expired";
+        }
+
+        if (daysRemaining <= 3)
+        {
+            return "Critical";
+        }
+
+        if (daysRemaining <= 7)
+        {
+            return "Urgent";
+        }
+
+        if (daysRemaining <= 14)
+        {
+            return "Warning";
+        }
+
+        return "Upcoming";
+    }
+
+    private static string GetStatusPillClass(string urgency)
+    {
+        if (urgency == "Expired" || urgency == "Critical")
+        {
+            return "status-pill--overdue";
+        }
+
+        if (urgency == "Urgent")
+        {
+            return "status-pill--in-progress";
+        }
+
+        if (urgency == "Warning")
+        {
+            return "status-pill--open";
+        }
+
+        return "status-pill--completed";
+    }
+
+    private static string GetUrgencyDotClass(string urgency)
+    {
+        if (urgency == "Expired")
+        {
+            return "urgency-dot--expired";
+        }
+
+        if (urgency == "Critical")
+        {
+            return "urgency-dot--critical";
+        }
+
+        if (urgency == "Urgent")
+        {
+            return "urgency-dot--urgent";
+        }
+
+        if (urgency == "Warning")
+        {
+            return "urgency-dot--warning";
+        }
+
+        return "urgency-dot--upcoming";
+    }
+
+    private sealed record CertificateExpiry(
+        string AssetNumber,
+        string TestType,
+        string AssetType,
+        string Region,
+        DateTime ExpiryDate);
+}
