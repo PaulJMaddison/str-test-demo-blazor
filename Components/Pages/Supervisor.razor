@@ -19,7 +19,6 @@
     }
 </section>
 
-
 <section class="card str-card mb-4" aria-label="Supervisor filters">
     <div class="card-body supervisor-filters">
         <div>
@@ -93,42 +92,74 @@
     private static readonly string[] TestTypeColors = ["#1E3A8A", "#2563EB", "#3B82F6", "#60A5FA", "#93C5FD"];
     private static readonly string[] RegionPalette = ["#1E40AF", "#2563EB", "#3B82F6", "#60A5FA", "#93C5FD"];
 
-    private static readonly IReadOnlyList<RegionOwnerSnapshot> SnapshotData =
+    private static readonly IReadOnlyList<PerformanceSnapshot> SnapshotData =
     [
-        new("North", "Field Team A", 52, 45, 5, 2, 68, 56, 62, 42, 50),
-        new("North", "Field Team B", 47, 39, 6, 2, 70, 60, 65, 44, 53),
-        new("North", "Contractor", 30, 24, 4, 2, 75, 63, 69, 46, 57),
+        // 7 days
+        new("7 days", "North", "Field Team A", 13, 11, 2, 0, 63, 51, 57, 38, 46, 3, 1),
+        new("7 days", "North", "Field Team B", 11, 9, 1, 1, 66, 55, 60, 40, 49, 2, 1),
+        new("7 days", "North", "Contractor", 7, 5, 1, 1, 71, 58, 64, 43, 53, 2, 0),
+        new("7 days", "South", "Field Team A", 12, 10, 1, 1, 64, 52, 58, 39, 47, 2, 1),
+        new("7 days", "South", "Field Team B", 10, 8, 1, 1, 67, 56, 61, 41, 50, 2, 1),
+        new("7 days", "South", "Contractor", 6, 4, 1, 1, 72, 59, 65, 44, 54, 1, 0),
+        new("7 days", "East", "Field Team A", 12, 10, 1, 1, 62, 50, 56, 37, 45, 2, 1),
+        new("7 days", "East", "Field Team B", 11, 9, 1, 1, 65, 54, 59, 39, 48, 2, 1),
+        new("7 days", "East", "Contractor", 6, 5, 1, 0, 70, 57, 63, 42, 52, 1, 0),
+        new("7 days", "West", "Field Team A", 10, 8, 1, 1, 65, 53, 58, 40, 48, 2, 1),
+        new("7 days", "West", "Field Team B", 9, 7, 1, 1, 68, 56, 61, 42, 50, 2, 1),
+        new("7 days", "West", "Contractor", 5, 4, 1, 0, 73, 60, 66, 45, 55, 1, 0),
+        new("7 days", "Central", "Field Team A", 11, 9, 1, 1, 61, 49, 55, 36, 44, 2, 1),
+        new("7 days", "Central", "Field Team B", 10, 8, 1, 1, 64, 52, 58, 38, 47, 2, 1),
+        new("7 days", "Central", "Contractor", 6, 5, 1, 0, 69, 56, 62, 41, 51, 1, 0),
 
-        new("South", "Field Team A", 44, 37, 5, 2, 69, 57, 61, 43, 51),
-        new("South", "Field Team B", 41, 33, 6, 2, 72, 61, 66, 46, 55),
-        new("South", "Contractor", 27, 21, 4, 2, 76, 64, 70, 49, 58),
+        // 30 days
+        new("30 days", "North", "Field Team A", 52, 45, 5, 2, 68, 56, 62, 42, 50, 7, 3),
+        new("30 days", "North", "Field Team B", 47, 39, 6, 2, 70, 60, 65, 44, 53, 6, 3),
+        new("30 days", "North", "Contractor", 30, 24, 4, 2, 75, 63, 69, 46, 57, 4, 2),
+        new("30 days", "South", "Field Team A", 44, 37, 5, 2, 69, 57, 61, 43, 51, 6, 2),
+        new("30 days", "South", "Field Team B", 41, 33, 6, 2, 72, 61, 66, 46, 55, 5, 2),
+        new("30 days", "South", "Contractor", 27, 21, 4, 2, 76, 64, 70, 49, 58, 3, 1),
+        new("30 days", "East", "Field Team A", 49, 42, 5, 2, 67, 55, 60, 41, 49, 6, 2),
+        new("30 days", "East", "Field Team B", 45, 37, 6, 2, 71, 59, 64, 45, 54, 5, 2),
+        new("30 days", "East", "Contractor", 29, 23, 4, 2, 74, 62, 68, 47, 56, 3, 1),
+        new("30 days", "West", "Field Team A", 39, 32, 5, 2, 70, 58, 63, 44, 52, 5, 2),
+        new("30 days", "West", "Field Team B", 36, 29, 5, 2, 73, 62, 67, 47, 55, 4, 2),
+        new("30 days", "West", "Contractor", 23, 18, 3, 2, 77, 65, 71, 50, 59, 3, 1),
+        new("30 days", "Central", "Field Team A", 46, 39, 5, 2, 66, 54, 59, 40, 48, 6, 2),
+        new("30 days", "Central", "Field Team B", 42, 35, 5, 2, 69, 58, 63, 43, 52, 5, 2),
+        new("30 days", "Central", "Contractor", 28, 22, 4, 2, 73, 61, 67, 46, 55, 3, 1),
 
-        new("East", "Field Team A", 49, 42, 5, 2, 67, 55, 60, 41, 49),
-        new("East", "Field Team B", 45, 37, 6, 2, 71, 59, 64, 45, 54),
-        new("East", "Contractor", 29, 23, 4, 2, 74, 62, 68, 47, 56),
-
-        new("West", "Field Team A", 39, 32, 5, 2, 70, 58, 63, 44, 52),
-        new("West", "Field Team B", 36, 29, 5, 2, 73, 62, 67, 47, 55),
-        new("West", "Contractor", 23, 18, 3, 2, 77, 65, 71, 50, 59),
-
-        new("Central", "Field Team A", 46, 39, 5, 2, 66, 54, 59, 40, 48),
-        new("Central", "Field Team B", 42, 35, 5, 2, 69, 58, 63, 43, 52),
-        new("Central", "Contractor", 28, 22, 4, 2, 73, 61, 67, 46, 55)
+        // 90 days
+        new("90 days", "North", "Field Team A", 150, 131, 14, 5, 67, 55, 61, 41, 50, 18, 9),
+        new("90 days", "North", "Field Team B", 141, 120, 16, 5, 69, 58, 64, 43, 52, 17, 8),
+        new("90 days", "North", "Contractor", 91, 74, 12, 5, 73, 61, 67, 45, 55, 12, 6),
+        new("90 days", "South", "Field Team A", 132, 112, 14, 6, 68, 56, 61, 42, 50, 16, 8),
+        new("90 days", "South", "Field Team B", 124, 103, 15, 6, 71, 59, 65, 44, 53, 15, 7),
+        new("90 days", "South", "Contractor", 84, 67, 12, 5, 75, 62, 69, 47, 56, 10, 5),
+        new("90 days", "East", "Field Team A", 146, 126, 14, 6, 66, 54, 60, 40, 49, 17, 8),
+        new("90 days", "East", "Field Team B", 136, 114, 16, 6, 70, 58, 63, 43, 52, 16, 8),
+        new("90 days", "East", "Contractor", 89, 72, 12, 5, 74, 61, 67, 45, 55, 11, 5),
+        new("90 days", "West", "Field Team A", 117, 97, 14, 6, 69, 57, 62, 43, 51, 15, 7),
+        new("90 days", "West", "Field Team B", 109, 89, 14, 6, 72, 60, 66, 46, 54, 14, 7),
+        new("90 days", "West", "Contractor", 79, 62, 11, 6, 76, 63, 70, 48, 58, 10, 4),
+        new("90 days", "Central", "Field Team A", 138, 118, 14, 6, 65, 53, 58, 39, 47, 16, 8),
+        new("90 days", "Central", "Field Team B", 128, 107, 15, 6, 68, 56, 62, 42, 50, 15, 7),
+        new("90 days", "Central", "Contractor", 86, 69, 12, 5, 72, 60, 66, 45, 54, 11, 5)
     ];
 
-    private IEnumerable<RegionOwnerSnapshot> FilteredSnapshots => SnapshotData.Where(MatchesFilters);
+    private IEnumerable<PerformanceSnapshot> FilteredSnapshots => SnapshotData
+        .Where(snapshot => snapshot.Window == SelectedWindow)
+        .Where(snapshot => SelectedRegion == "All Regions" || snapshot.Region == SelectedRegion)
+        .Where(snapshot => SelectedOwner == "All Owners" || snapshot.Owner == SelectedOwner);
 
     private IReadOnlyList<KpiMetric> CurrentKpiCards
     {
         get
         {
             var snapshots = FilteredSnapshots.ToList();
-            var completed = ScaleCount(snapshots.Sum(snapshot => snapshot.Completed));
-            var fail = ScaleCount(snapshots.Sum(snapshot => snapshot.Fail));
-            var notApplicable = ScaleCount(snapshots.Sum(snapshot => snapshot.NotApplicable));
-            var avgMinutes = (int)Math.Round(ComputeWeightedAverageMinutes(snapshots));
-            var overdue = (int)Math.Round((fail + notApplicable) * 0.58, MidpointRounding.AwayFromZero);
-            var unassigned = Math.Max(2, (int)Math.Round(completed * 0.05, MidpointRounding.AwayFromZero));
+            var completed = snapshots.Sum(snapshot => snapshot.Completed);
+            var overdue = snapshots.Sum(snapshot => snapshot.Overdue);
+            var unassigned = snapshots.Sum(snapshot => snapshot.Unassigned);
+            var avgMinutes = (int)Math.Round(ComputeWeightedAverageMinutes(snapshots), MidpointRounding.AwayFromZero);
 
             return
             [
@@ -149,11 +180,11 @@
     private double[] RegionValues => FilteredSnapshots
         .GroupBy(snapshot => snapshot.Region)
         .OrderBy(group => group.Key)
-        .Select(group => (double)ScaleCount(group.Sum(snapshot => snapshot.Completed)))
+        .Select(group => (double)group.Sum(snapshot => snapshot.Completed))
         .ToArray();
 
     private string[] RegionColors => RegionLabels
-        .Select((label, i) => RegionPalette[i % RegionPalette.Length])
+        .Select((_, index) => RegionPalette[index % RegionPalette.Length])
         .ToArray();
 
     private double[] OutcomeValues
@@ -163,9 +194,9 @@
             var snapshots = FilteredSnapshots.ToList();
             return
             [
-                ScaleCount(snapshots.Sum(snapshot => snapshot.Pass)),
-                ScaleCount(snapshots.Sum(snapshot => snapshot.Fail)),
-                ScaleCount(snapshots.Sum(snapshot => snapshot.NotApplicable))
+                snapshots.Sum(snapshot => snapshot.Pass),
+                snapshots.Sum(snapshot => snapshot.Fail),
+                snapshots.Sum(snapshot => snapshot.NotApplicable)
             ];
         }
     }
@@ -175,13 +206,6 @@
         get
         {
             var snapshots = FilteredSnapshots.ToList();
-            var durationAdjustment = SelectedWindow switch
-            {
-                "7 days" => 2,
-                "90 days" => -2,
-                _ => 0
-            };
-
             if (snapshots.Count == 0)
             {
                 return [0, 0, 0, 0, 0];
@@ -189,35 +213,16 @@
 
             return
             [
-                Math.Round(snapshots.Average(snapshot => snapshot.ElectricalSafetyMinutes) + durationAdjustment, 1),
-                Math.Round(snapshots.Average(snapshot => snapshot.FunctionalMinutes) + durationAdjustment, 1),
-                Math.Round(snapshots.Average(snapshot => snapshot.CalibrationMinutes) + durationAdjustment, 1),
-                Math.Round(snapshots.Average(snapshot => snapshot.VisualInspectionMinutes) + durationAdjustment, 1),
-                Math.Round(snapshots.Average(snapshot => snapshot.LeakTestMinutes) + durationAdjustment, 1)
+                Math.Round(snapshots.Average(snapshot => snapshot.ElectricalSafetyMinutes), 1),
+                Math.Round(snapshots.Average(snapshot => snapshot.FunctionalMinutes), 1),
+                Math.Round(snapshots.Average(snapshot => snapshot.CalibrationMinutes), 1),
+                Math.Round(snapshots.Average(snapshot => snapshot.VisualInspectionMinutes), 1),
+                Math.Round(snapshots.Average(snapshot => snapshot.LeakTestMinutes), 1)
             ];
         }
     }
 
-    private bool MatchesFilters(RegionOwnerSnapshot snapshot)
-    {
-        var regionMatch = SelectedRegion == "All Regions" || snapshot.Region == SelectedRegion;
-        var ownerMatch = SelectedOwner == "All Owners" || snapshot.Owner == SelectedOwner;
-        return regionMatch && ownerMatch;
-    }
-
-    private int ScaleCount(int value)
-    {
-        var multiplier = SelectedWindow switch
-        {
-            "7 days" => 0.23,
-            "90 days" => 2.9,
-            _ => 1.0
-        };
-
-        return (int)Math.Max(1, Math.Round(value * multiplier, MidpointRounding.AwayFromZero));
-    }
-
-    private double ComputeWeightedAverageMinutes(IReadOnlyList<RegionOwnerSnapshot> snapshots)
+    private static double ComputeWeightedAverageMinutes(IReadOnlyList<PerformanceSnapshot> snapshots)
     {
         if (snapshots.Count == 0)
         {
@@ -230,22 +235,16 @@
             return 0;
         }
 
-        var weightedSum = snapshots.Sum(snapshot => snapshot.Completed *
+        var weightedDurationSum = snapshots.Sum(snapshot => snapshot.Completed *
             (snapshot.ElectricalSafetyMinutes + snapshot.FunctionalMinutes + snapshot.CalibrationMinutes + snapshot.VisualInspectionMinutes + snapshot.LeakTestMinutes) / 5.0);
 
-        var adjustment = SelectedWindow switch
-        {
-            "7 days" => 2,
-            "90 days" => -2,
-            _ => 0
-        };
-
-        return (weightedSum / totalCompleted) + adjustment;
+        return weightedDurationSum / totalCompleted;
     }
 
     private sealed record KpiMetric(string Label, string Value, string ThemeClass, string IconPath);
 
-    private sealed record RegionOwnerSnapshot(
+    private sealed record PerformanceSnapshot(
+        string Window,
         string Region,
         string Owner,
         int Completed,
@@ -256,5 +255,7 @@
         int FunctionalMinutes,
         int CalibrationMinutes,
         int VisualInspectionMinutes,
-        int LeakTestMinutes);
+        int LeakTestMinutes,
+        int Overdue,
+        int Unassigned);
 }
