@@ -1,5 +1,5 @@
 .run-test-header .card-body {
-    padding-bottom: 0.75rem;
+    padding: 1rem 1.1rem;
 }
 
 .run-test-header__top {
@@ -7,47 +7,121 @@
     justify-content: space-between;
     gap: 1rem;
     flex-wrap: wrap;
-    align-items: stretch;
+    align-items: center;
 }
 
 .run-test-header__left {
     display: flex;
-    align-items: flex-start;
-    gap: 1rem;
+    align-items: center;
+    gap: 0.9rem;
     flex-wrap: wrap;
+}
+
+.run-test-back-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+}
+
+.run-test-icon {
+    width: 1rem;
+    height: 1rem;
+    display: inline-flex;
+}
+
+.run-test-icon svg {
+    width: 100%;
+    height: 100%;
+    fill: currentColor;
 }
 
 .run-test-header__asset {
-    font-size: 1.35rem;
+    font-size: 1.65rem;
     font-weight: 700;
-    line-height: 1.2;
+    line-height: 1.1;
 }
 
 .run-test-header__right {
-    min-width: 280px;
+    min-width: 340px;
     border: 1px solid #d5deee;
     border-radius: 12px;
-    padding: 0.85rem;
-    background: #f6f9ff;
+    padding: 0.8rem;
+    background: linear-gradient(180deg, #f8faff 0%, #f3f7ff 100%);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+}
+
+.timer-display {
+    font-size: 1.6rem;
+    line-height: 1;
+    font-weight: 700;
+    font-variant-numeric: tabular-nums;
+}
+
+.run-test-header__actions {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    flex-wrap: wrap;
+    gap: 0.5rem;
 }
 
 .complete-test-btn {
-    min-width: 8.5rem;
+    min-width: 10rem;
 }
 
 .run-test-header__strip {
-    margin-top: 0.85rem;
-    padding-top: 0.6rem;
+    margin-top: 0.9rem;
+    padding-top: 0.75rem;
     border-top: 1px solid #dee2e6;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(145px, 1fr));
+    gap: 0.75rem;
+}
+
+.context-item {
     display: flex;
-    flex-wrap: wrap;
-    gap: 0.75rem 1.1rem;
-    font-size: 0.9rem;
-    align-items: center;
+    flex-direction: column;
+    gap: 0.2rem;
+}
+
+.context-label {
+    font-size: 0.73rem;
+    letter-spacing: 0.02em;
+    text-transform: uppercase;
+    color: #69788c;
+    font-weight: 700;
+}
+
+.context-value {
+    font-weight: 600;
 }
 
 .completion-banner {
     border-left: 0.4rem solid #198754;
+}
+
+.run-test-main-layout {
+    padding-bottom: 1rem;
+}
+
+.task-checklist-card {
+    position: sticky;
+    top: 1rem;
+}
+
+.task-filter-row {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 0.45rem;
+}
+
+.task-filter-row .btn {
+    font-size: 0.85rem;
+    padding-top: 0.4rem;
+    padding-bottom: 0.4rem;
 }
 
 .task-list .list-group-item {
@@ -60,13 +134,26 @@
     background: #edf4ff;
     color: #102640;
     border-color: #9dbcf0;
+    box-shadow: inset 0 0 0 1px #8cb2ef;
 }
 
 .task-title-wrap {
     display: flex;
     flex-direction: column;
     align-items: flex-start;
-    gap: 0.28rem;
+    gap: 0.32rem;
+}
+
+.task-title-row {
+    display: flex;
+    gap: 0.4rem;
+    align-items: center;
+    flex-wrap: wrap;
+}
+
+.task-title {
+    font-weight: 600;
+    text-align: left;
 }
 
 .task-result-chip {
@@ -81,11 +168,34 @@
     width: 0.6rem;
     height: 0.6rem;
     border-radius: 999px;
-    background: #b9c6da;
+    background: currentColor;
 }
 
-.task-complete-dot--done {
-    background: #1f8f52;
+.task-result-not-run {
+    color: #6b7789;
+}
+
+.task-result-pass {
+    color: #1f8f52;
+}
+
+.task-result-fail {
+    color: #c73935;
+}
+
+.task-result-na {
+    color: #495670;
+}
+
+.task-details-shell {
+    margin-top: 0.9rem;
+    display: grid;
+    gap: 1rem;
+}
+
+.form-section-title {
+    font-weight: 700;
+    margin-bottom: 0.4rem;
 }
 
 .result-segmented {
@@ -96,11 +206,16 @@
 
 .result-btn {
     min-height: 52px;
+    font-weight: 700;
+}
+
+.comments-input {
+    border-color: #cfd9eb;
 }
 
 .photo-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(110px, 1fr));
+    grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
     gap: 0.7rem;
 }
 
@@ -111,6 +226,7 @@
     overflow: hidden;
     background-color: #f8f9fa;
     transition: transform 120ms ease, box-shadow 150ms ease;
+    padding: 0;
 }
 
 .photo-thumb:hover {
@@ -121,15 +237,34 @@
 .photo-thumb img {
     display: block;
     width: 100%;
-    aspect-ratio: 3 / 2;
+    aspect-ratio: 4 / 3;
     object-fit: cover;
+}
+
+.minutes-row {
+    display: flex;
+    align-items: end;
+    flex-wrap: wrap;
+    gap: 1rem;
+    border-top: 1px solid #e5ebf5;
+    padding-top: 0.85rem;
+}
+
+.minutes-input {
+    max-width: 140px;
+}
+
+.minutes-summary {
+    display: flex;
+    flex-direction: column;
+    gap: 0.2rem;
 }
 
 .activity-log-list {
     display: flex;
     flex-direction: column;
     gap: 0.75rem;
-    max-height: 460px;
+    max-height: 350px;
     overflow-y: auto;
     padding-right: 0.25rem;
 }
@@ -140,6 +275,45 @@
     padding: 0.6rem 0.75rem;
     background-color: #fbfdff;
     animation: entry-in 260ms ease-out;
+}
+
+.status-pill-overdue {
+    background-color: #fce9e8;
+    color: #a6322f;
+}
+
+.photo-modal-backdrop {
+    position: fixed;
+    inset: 0;
+    background-color: rgba(10, 25, 49, 0.65);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 1rem;
+    z-index: 1050;
+}
+
+.photo-modal-dialog {
+    width: min(700px, 100%);
+    background: #fff;
+    border-radius: 12px;
+    overflow: hidden;
+    border: 1px solid #d7e0ef;
+}
+
+.photo-modal-header {
+    padding: 0.75rem 1rem;
+    border-bottom: 1px solid #e7ecf4;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.photo-modal-image {
+    width: 100%;
+    max-height: 70vh;
+    object-fit: contain;
+    background: #f8fbff;
 }
 
 @keyframes entry-in {
@@ -154,12 +328,26 @@
     }
 }
 
+@media (max-width: 1199.98px) {
+    .task-checklist-card {
+        position: static;
+    }
+}
+
 @media (max-width: 767.98px) {
     .run-test-header__right {
         width: 100%;
+        min-width: 0;
+        flex-direction: column;
+        align-items: flex-start;
     }
 
-    .run-test-header__right .d-flex {
-        justify-content: flex-start !important;
+    .run-test-header__actions {
+        width: 100%;
+        justify-content: flex-start;
+    }
+
+    .minutes-row {
+        align-items: flex-start;
     }
 }
