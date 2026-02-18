@@ -1,13 +1,15 @@
 .donut-layout {
     display: grid;
-    grid-template-columns: minmax(140px, 220px) 1fr;
+    grid-template-columns: minmax(150px, 210px) minmax(0, 1fr);
     align-items: center;
-    gap: 1rem;
+    gap: 0.8rem;
 }
 
 .donut-svg {
     width: 100%;
     height: auto;
+    max-width: 200px;
+    justify-self: center;
 }
 
 .donut-track,
@@ -42,7 +44,8 @@
     margin: 0;
     padding: 0;
     display: grid;
-    gap: 0.45rem;
+    gap: 0.35rem;
+    min-width: 0;
 }
 
 .donut-legend__item {
@@ -51,7 +54,11 @@
     gap: 0.5rem;
     align-items: center;
     color: var(--str-text-color, #0f172a);
-    font-size: 0.9rem;
+    font-size: 0.86rem;
+}
+
+.donut-legend__item span {
+    min-width: 0;
 }
 
 .donut-legend__swatch {

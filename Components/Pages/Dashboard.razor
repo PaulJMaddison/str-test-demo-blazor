@@ -45,27 +45,42 @@
     <article class="card str-card">
         <div class="card-body">
             <h2 class="h5">Tests by Day</h2>
-            <div class="str-card" style="height:300px">
-                <ChartJsWrapper ChartId="tests-by-day-chart" ChartType="bar" Labels="@TestsByDayLabels" Data="@TestsByDayValues" BackgroundColors="@TestsByDayColors" />
+            <div class="chart-surface chart-surface--bar">
+                <BarChart Labels="@TestsByDayLabels" Values="@TestsByDayValues" />
             </div>
+            <ul class="chart-insights" aria-label="Tests by day summary">
+                <li><strong>Total this week:</strong> @WeeklyTestsTotal</li>
+                <li><strong>Daily average:</strong> @AverageDailyTests.ToString("0.0")</li>
+                <li><strong>Busiest day:</strong> @BusiestDayLabel (@BusiestDayValue.ToString("0"))</li>
+            </ul>
         </div>
     </article>
 
-    <article class="card str-card">
+    <article class="card str-card chart-grid__status">
         <div class="card-body">
             <h2 class="h5">Status Breakdown</h2>
-            <div class="str-card" style="height:300px">
-                <ChartJsWrapper ChartId="status-breakdown-chart" ChartType="doughnut" Labels="@StatusLabels" Data="@StatusValues" BackgroundColors="@StatusColors" />
+            <div class="chart-surface chart-surface--status">
+                <DonutChart Segments="@StatusSegments" />
             </div>
+            <p class="chart-note mb-0">Open and overdue counts are included to highlight active queue pressure.</p>
         </div>
     </article>
 
     <article class="card str-card chart-grid__wide">
         <div class="card-body">
             <h2 class="h5">Workload by Technician</h2>
-            <div class="str-card" style="height:300px">
-                <ChartJsWrapper ChartId="workload-chart" ChartType="bar" Labels="@TechnicianLabels" Data="@TechnicianValues" BackgroundColors="@TechnicianColors" />
+            <div class="chart-surface chart-surface--workload">
+                <HorizontalBarChart Labels="@TechnicianLabels" Values="@TechnicianValues" />
             </div>
+            <ul class="chart-insights chart-insights--split" aria-label="Workload by technician summary">
+                @foreach (var technician in TechnicianSummary)
+                {
+                    <li>
+                        <span>@technician.Label</span>
+                        <strong>@technician.Value.ToString("0") tests</strong>
+                    </li>
+                }
+            </ul>
         </div>
     </article>
 </section>
@@ -168,19 +183,30 @@
 
     private double[] TestsByDayValues => TestsByDayChartData.Values;
 
-    private string[] TestsByDayColors => ["#4472c4", "#5b9bd5", "#70ad47", "#ffc000", "#ed7d31", "#a5a5a5", "#264478"];
+    private IReadOnlyList<ChartPoint> TestsByDaySeries =>
+        TestsByDayLabels.Zip(TestsByDayValues, (label, value) => new ChartPoint(label, value)).ToArray();
+
+    private double WeeklyTestsTotal => TestsByDaySeries.Sum(item => item.Value);
+
+    private double AverageDailyTests => TestsByDaySeries.Count == 0 ? 0 : WeeklyTestsTotal / TestsByDaySeries.Count;
+
+    private string BusiestDayLabel => TestsByDaySeries.OrderByDescending(item => item.Value).FirstOrDefault()?.Label ?? "N/A";
+
+    private double BusiestDayValue => TestsByDaySeries.OrderByDescending(item => item.Value).FirstOrDefault()?.Value ?? 0;
 
     private string[] StatusLabels => StatusChartData.Labels;
 
     private double[] StatusValues => StatusChartData.Values;
 
+    private IEnumerable<DonutChart.DonutSegment> StatusSegments =>
+        StatusLabels.Zip(StatusValues, (label, value) => new DonutChart.DonutSegment(label, value));
+
     private string[] TechnicianLabels => TechnicianChartData.Labels;
 
     private double[] TechnicianValues => TechnicianChartData.Values;
 
-    private string[] TechnicianColors => ["#5b9bd5", "#70ad47", "#ffc000", "#ed7d31", "#a5a5a5", "#4472c4"];
-
-    private string[] StatusColors => ["#5b9bd5", "#ffc000", "#70ad47", "#ed7d31"];
+    private IReadOnlyList<ChartPoint> TechnicianSummary =>
+        TechnicianLabels.Zip(TechnicianValues, (label, value) => new ChartPoint(label, value)).ToArray();
 
     private (string[] Labels, double[] Values) TestsByDayChartData
     {
@@ -274,4 +300,6 @@
         "Overdue" => "status-pill-overdue",
         _ => "status-pill-open"
     };
+
+    private sealed record ChartPoint(string Label, double Value);
 }

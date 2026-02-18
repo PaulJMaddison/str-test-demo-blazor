@@ -1,57 +1,77 @@
 @using System.Globalization
 
-<div class="hbar-card" role="img" aria-label="Horizontal bar chart">
-    <svg class="hbar-svg" viewBox="0 0 @Width @ChartHeight" preserveAspectRatio="xMidYMid meet">
-        @foreach (var bar in Bars)
+<div class="hbar-chart" role="img" aria-label="Horizontal bar chart showing tests by technician with axis values">
+    <div class="hbar-chart__rows" aria-hidden="true">
+        @foreach (var row in Rows)
         {
-            <svg:text x="@(LabelColumn - 10)"
-                  y="@bar.TextY.ToString("0.##", CultureInfo.InvariantCulture)"
-                  text-anchor="end"
-                  class="hbar-label">@bar.Label</svg:text>
-
-            <rect x="@LabelColumn"
-                  y="@bar.Y.ToString("0.##", CultureInfo.InvariantCulture)"
-                  width="@bar.Width.ToString("0.##", CultureInfo.InvariantCulture)"
-                  height="@BarHeight"
-                  rx="4"
-                  class="hbar-bar" />
+            <div class="hbar-chart__row">
+                <div class="hbar-chart__label">@row.Label</div>
+                <div class="hbar-chart__plot">
+                    <div class="hbar-chart__track"></div>
+                    <div class="hbar-chart__fill" style="width:@row.WidthPercent.ToString("0.##", CultureInfo.InvariantCulture)%"></div>
+                    <span class="hbar-chart__value">@row.ValueLabel</span>
+                </div>
+            </div>
         }
-    </svg>
+    </div>
+
+    <div class="hbar-chart__axis" aria-hidden="true">
+        @foreach (var tick in AxisTicks)
+        {
+            <span class="hbar-chart__tick" style="left:@tick.LeftPercent.ToString("0.##", CultureInfo.InvariantCulture)%">@tick.Label</span>
+        }
+        <span class="hbar-chart__axis-title">Tests (count)</span>
+    </div>
 </div>
 
 @code {
     [Parameter, EditorRequired] public string[] Labels { get; set; } = Array.Empty<string>();
     [Parameter, EditorRequired] public double[] Values { get; set; } = Array.Empty<double>();
 
-    private const double Width = 600;
-    private const double LabelColumn = 150;
-    private const double RowHeight = 32;
-    private const double BarHeight = 18;
-    private const double TopPadding = 12;
-    private double ChartHeight => TopPadding * 2 + Math.Max(1, Math.Min(Labels.Length, Values.Length)) * RowHeight;
+    private double MaxValue => Math.Max(1, Values.Take(Math.Min(Labels.Length, Values.Length)).DefaultIfEmpty(1).Max());
 
-    private IReadOnlyList<HBarEntry> Bars
+    private IReadOnlyList<ChartRow> Rows
     {
         get
         {
             var count = Math.Min(Labels.Length, Values.Length);
             if (count == 0)
             {
-                return Array.Empty<HBarEntry>();
+                return Array.Empty<ChartRow>();
             }
 
-            var max = Values.Take(count).DefaultIfEmpty(1).Max();
-            var usableWidth = Width - LabelColumn - 16;
-
-            return Enumerable.Range(0, count).Select(index =>
-            {
-                var value = Math.Max(0, Values[index]);
-                var width = max <= 0 ? 0 : value / max * usableWidth;
-                var y = TopPadding + index * RowHeight + (RowHeight - BarHeight) / 2;
-                return new HBarEntry(Labels[index], y, width, y + BarHeight - 4);
-            }).ToArray();
+            var max = MaxValue;
+            return Enumerable.Range(0, count)
+                .Select(index =>
+                {
+                    var value = Math.Max(0, Values[index]);
+                    var width = value / max * 100;
+                    return new ChartRow(
+                        Labels[index],
+                        width,
+                        value.ToString("0.#", CultureInfo.InvariantCulture));
+                })
+                .ToArray();
         }
     }
 
-    private sealed record HBarEntry(string Label, double Y, double Width, double TextY);
+    private IReadOnlyList<AxisTick> AxisTicks
+    {
+        get
+        {
+            var max = MaxValue;
+            const int steps = 4;
+            return Enumerable.Range(0, steps + 1)
+                .Select(index =>
+                {
+                    var ratio = index / (double)steps;
+                    var value = max * ratio;
+                    return new AxisTick(ratio * 100, value.ToString("0.#", CultureInfo.InvariantCulture));
+                })
+                .ToArray();
+        }
+    }
+
+    private sealed record ChartRow(string Label, double WidthPercent, string ValueLabel);
+    private sealed record AxisTick(double LeftPercent, string Label);
 }
