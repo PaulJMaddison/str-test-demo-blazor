@@ -18,6 +18,19 @@ else
 
     <article class="certificate card str-card">
         <div class="card-body p-4 p-md-5">
+            <div class="result-banner @(FailCount > 0 ? "result-banner-fail" : "result-banner-pass") mb-4" role="status">
+                @if (FailCount > 0)
+                {
+                    <strong>FAILED</strong>
+                    <span>@FailCount issue@(FailCount == 1 ? string.Empty : "s") found</span>
+                }
+                else
+                {
+                    <strong>PASSED</strong>
+                    <span>No failed checks detected</span>
+                }
+            </div>
+
             <header class="certificate-header mb-4 pb-3 border-bottom">
                 <p class="text-uppercase text-muted small mb-2">Serviceability Test Certificate</p>
                 <h2 class="h3 mb-1">Serviceability Test Certificate</h2>
@@ -35,30 +48,38 @@ else
                 <div class="col-12 col-md-6">
                     <h3 class="h6 text-uppercase text-muted">Test Run</h3>
                     <p class="mb-1"><strong>Template:</strong> @_template.Name</p>
-                    <p class="mb-1"><strong>Completed:</strong> @_testRun.CompletedAt?.ToString("f")</p>
-                    <p class="mb-0"><strong>Technician:</strong> @_testRun.TechnicianName</p>
+                    <div class="certificate-meta-grid">
+                        <p class="mb-1"><span class="text-muted">Completed by</span><span>@_testRun.TechnicianName</span></p>
+                        <p class="mb-0"><span class="text-muted">Completed at</span><span>@_testRun.CompletedAt?.ToString("f")</span></p>
+                    </div>
                 </div>
             </section>
 
             <section class="mb-4">
                 <h3 class="h6 text-uppercase text-muted">Summary</h3>
                 <div class="row g-3">
-                    <div class="col-12 col-sm-4">
+                    <div class="col-6 col-md-3">
                         <div class="summary-card border rounded p-3 text-center">
-                            <p class="small text-muted mb-1">Pass</p>
+                            <p class="small text-muted mb-1">Pass Count</p>
                             <p class="h4 mb-0">@PassCount</p>
                         </div>
                     </div>
-                    <div class="col-12 col-sm-4">
+                    <div class="col-6 col-md-3">
                         <div class="summary-card border rounded p-3 text-center">
-                            <p class="small text-muted mb-1">Fail</p>
+                            <p class="small text-muted mb-1">Fail Count</p>
                             <p class="h4 mb-0">@FailCount</p>
                         </div>
                     </div>
-                    <div class="col-12 col-sm-4">
+                    <div class="col-6 col-md-3">
                         <div class="summary-card border rounded p-3 text-center">
-                            <p class="small text-muted mb-1">N/A</p>
+                            <p class="small text-muted mb-1">N/A Count</p>
                             <p class="h4 mb-0">@NaCount</p>
+                        </div>
+                    </div>
+                    <div class="col-6 col-md-3">
+                        <div class="summary-card border rounded p-3 text-center">
+                            <p class="small text-muted mb-1">Total Minutes</p>
+                            <p class="h4 mb-0">@(_testRun.TotalMinutes)</p>
                         </div>
                     </div>
                 </div>
@@ -78,10 +99,19 @@ else
                         <tbody>
                             @foreach (var task in _testRun.TestTaskRuns)
                             {
-                                <tr>
+                                <tr class="task-row">
                                     <td>@task.Title</td>
-                                    <td>@task.Result</td>
-                                    <td>@(string.IsNullOrWhiteSpace(task.Comment) ? "—" : task.Comment)</td>
+                                    <td><span class="result-pill @GetResultClass(task.Result)">@task.Result</span></td>
+                                    <td>
+                                        @if (string.IsNullOrWhiteSpace(task.Comment))
+                                        {
+                                            <span class="text-muted">—</span>
+                                        }
+                                        else
+                                        {
+                                            @task.Comment
+                                        }
+                                    </td>
                                 </tr>
                             }
                         </tbody>
@@ -101,12 +131,14 @@ else
                         @foreach (var path in AssetPhotoGalleryPaths)
                         {
                             <button class="certificate-photo-button" type="button" @onclick="() => OpenPhoto(path)">
-                                <img class="certificate-photo border rounded" src="@ToWebPath(path)" alt="Asset photo placeholder" />
+                                <img class="certificate-photo" src="@ToWebPath(path)" alt="Asset evidence photo" />
                             </button>
                         }
                     </div>
                 }
             </section>
+
+            <footer class="print-footer">Generated by STR Serviceability Testing (Demo)</footer>
         </div>
     </article>
 
@@ -134,20 +166,12 @@ else
     private int FailCount => _testRun?.TestTaskRuns.Count(task => task.Result == str_test_demo_blazor.Domain.TestTaskResult.Fail) ?? 0;
     private int NaCount => _testRun?.TestTaskRuns.Count(task => task.Result == str_test_demo_blazor.Domain.TestTaskResult.NA) ?? 0;
 
-    private IReadOnlyList<string> AssetPhotoGalleryPaths
-    {
-        get
-        {
-            if (_asset is null)
-            {
-                return [];
-            }
-
-            var primaryPath = GetAssetPhotoPath(_asset);
-            var gallery = AssetPhotoCandidates.Where(path => path != primaryPath).Prepend(primaryPath).ToList();
-            return gallery;
-        }
-    }
+    private IReadOnlyList<string> AssetPhotoGalleryPaths =>
+        _testRun?.TestTaskRuns
+            .SelectMany(task => task.PhotoSvgPaths)
+            .Where(path => AssetPhotoCandidates.Contains(path))
+            .Distinct()
+            .ToList() ?? [];
 
     private static readonly IReadOnlyList<string> AssetPhotoCandidates =
     [
@@ -175,33 +199,14 @@ else
 
     private async Task Print() => await Js.InvokeVoidAsync("print");
 
-    private static string GetAssetPhotoPath(str_test_demo_blazor.Domain.Asset asset)
+    private static string GetResultClass(str_test_demo_blazor.Domain.TestTaskResult result)
     {
-        var type = asset.Type ?? string.Empty;
-
-        if (type.Contains("Hydraulic", StringComparison.OrdinalIgnoreCase) || asset.AssetTag.StartsWith("HYD", StringComparison.OrdinalIgnoreCase))
+        return result switch
         {
-            return "demo-images/asset-photos/asset-hydraulic-press.svg";
-        }
-
-        if (type.Contains("Crane", StringComparison.OrdinalIgnoreCase) || asset.AssetTag.StartsWith("CRN", StringComparison.OrdinalIgnoreCase))
-        {
-            return "demo-images/asset-photos/asset-crane-assembly.svg";
-        }
-
-        if (type.Contains("Compressor", StringComparison.OrdinalIgnoreCase) || asset.AssetTag.StartsWith("CMP", StringComparison.OrdinalIgnoreCase))
-        {
-            return "demo-images/asset-photos/asset-compressor-unit.svg";
-        }
-
-        if (type.Contains("Power", StringComparison.OrdinalIgnoreCase)
-            || type.Contains("Control Panel", StringComparison.OrdinalIgnoreCase)
-            || asset.AssetTag.StartsWith("PWR", StringComparison.OrdinalIgnoreCase))
-        {
-            return "demo-images/asset-photos/asset-power-panel.svg";
-        }
-
-        return "demo-images/photo-placeholder-1.svg";
+            str_test_demo_blazor.Domain.TestTaskResult.Pass => "result-pill-pass",
+            str_test_demo_blazor.Domain.TestTaskResult.Fail => "result-pill-fail",
+            _ => "result-pill-neutral"
+        };
     }
 
     private void OpenPhoto(string path) => _activePhotoPath = path;
