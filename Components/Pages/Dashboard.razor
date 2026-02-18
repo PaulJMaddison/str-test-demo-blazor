@@ -53,7 +53,16 @@
                         var asset = DemoData.FindAsset(test.AssetId);
 
                         <tr>
-                            <td>@test.Id</td>
+                            <td>
+                                @if (test.Status == str_test_demo_blazor.Domain.TestRunStatus.Completed)
+                                {
+                                    <a href="@($"/certificate/{test.Id}")">@test.Id</a>
+                                }
+                                else
+                                {
+                                    @test.Id
+                                }
+                            </td>
                             <td>@asset?.AssetTag</td>
                             <td>@test.Status</td>
                             <td>@test.TechnicianName</td>

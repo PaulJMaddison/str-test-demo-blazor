@@ -1,22 +1,151 @@
-@page "/certificate"
+@page "/certificate/{TestId:guid}"
 @inject IJSRuntime Js
+@inject str_test_demo_blazor.Services.DemoDataService DemoData
 
 <PageTitle>Certificate</PageTitle>
 
-<h1>Certificate</h1>
-<p class="text-muted">Demo-only certificate workflow with placeholder actions and no persistence.</p>
-
-<section class="card shadow-sm">
-    <div class="card-body">
-        <h2 class="h5">Certificate Actions</h2>
-        <p class="mb-3">Use this placeholder to simulate certificate output for a completed test.</p>
-        <button class="btn btn-outline-primary" @onclick="GenerateCertificate">Generate Certificate PDF (demo)</button>
+@if (_testRun is null || _asset is null || _template is null)
+{
+    <h1>Certificate</h1>
+    <p class="text-muted">No completed test run found for this certificate.</p>
+}
+else
+{
+    <div class="d-flex justify-content-between align-items-center flex-wrap gap-2 mb-3 no-print">
+        <h1 class="mb-0">Certificate Preview</h1>
+        <button class="btn btn-primary" type="button" @onclick="Print">Print</button>
     </div>
-</section>
+
+    <article class="certificate card shadow-sm">
+        <div class="card-body p-4 p-md-5">
+            <header class="certificate-header mb-4 pb-3 border-bottom">
+                <p class="text-uppercase text-muted small mb-2">Serviceability Test Certificate</p>
+                <h2 class="h3 mb-1">Serviceability Test Certificate</h2>
+                <p class="mb-0 text-muted">Certificate ID: @_testRun.Id</p>
+            </header>
+
+            <section class="row g-3 mb-4">
+                <div class="col-12 col-md-6">
+                    <h3 class="h6 text-uppercase text-muted">Asset</h3>
+                    <p class="mb-1"><strong>Tag:</strong> @_asset.AssetTag</p>
+                    <p class="mb-1"><strong>Serial:</strong> @_asset.Serial</p>
+                    <p class="mb-1"><strong>Type:</strong> @_asset.Type</p>
+                    <p class="mb-0"><strong>Location:</strong> @_asset.Location</p>
+                </div>
+                <div class="col-12 col-md-6">
+                    <h3 class="h6 text-uppercase text-muted">Test Run</h3>
+                    <p class="mb-1"><strong>Template:</strong> @_template.Name</p>
+                    <p class="mb-1"><strong>Completed:</strong> @_testRun.CompletedAt?.ToString("f")</p>
+                    <p class="mb-0"><strong>Technician:</strong> @_testRun.TechnicianName</p>
+                </div>
+            </section>
+
+            <section class="mb-4">
+                <h3 class="h6 text-uppercase text-muted">Summary</h3>
+                <div class="row g-3">
+                    <div class="col-12 col-sm-4">
+                        <div class="summary-card border rounded p-3 text-center">
+                            <p class="small text-muted mb-1">Pass</p>
+                            <p class="h4 mb-0">@PassCount</p>
+                        </div>
+                    </div>
+                    <div class="col-12 col-sm-4">
+                        <div class="summary-card border rounded p-3 text-center">
+                            <p class="small text-muted mb-1">Fail</p>
+                            <p class="h4 mb-0">@FailCount</p>
+                        </div>
+                    </div>
+                    <div class="col-12 col-sm-4">
+                        <div class="summary-card border rounded p-3 text-center">
+                            <p class="small text-muted mb-1">N/A</p>
+                            <p class="h4 mb-0">@NaCount</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section class="mb-4">
+                <h3 class="h6 text-uppercase text-muted">Task Results</h3>
+                <div class="table-responsive">
+                    <table class="table table-bordered align-middle mb-0 certificate-table">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Task</th>
+                                <th>Result</th>
+                                <th>Comment</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var task in _testRun.TestTaskRuns)
+                            {
+                                <tr>
+                                    <td>@task.Title</td>
+                                    <td>@task.Result</td>
+                                    <td>@(string.IsNullOrWhiteSpace(task.Comment) ? "—" : task.Comment)</td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+            <section>
+                <h3 class="h6 text-uppercase text-muted">Photo Thumbnails</h3>
+                @if (PhotoPaths.Count == 0)
+                {
+                    <p class="text-muted mb-0">No photos attached.</p>
+                }
+                else
+                {
+                    <div class="d-flex flex-wrap gap-3">
+                        @foreach (var path in PhotoPaths)
+                        {
+                            <figure class="mb-0">
+                                <img class="certificate-photo border rounded" src="@ToWebPath(path)" alt="Task photo placeholder" />
+                            </figure>
+                        }
+                    </div>
+                }
+            </section>
+        </div>
+    </article>
+}
 
 @code {
-    private async Task GenerateCertificate()
+    [Parameter]
+    public Guid TestId { get; set; }
+
+    private str_test_demo_blazor.Domain.TestRun? _testRun;
+    private str_test_demo_blazor.Domain.Asset? _asset;
+    private str_test_demo_blazor.Domain.TestTemplate? _template;
+
+    private int PassCount => _testRun?.TestTaskRuns.Count(task => task.Result == str_test_demo_blazor.Domain.TestTaskResult.Pass) ?? 0;
+    private int FailCount => _testRun?.TestTaskRuns.Count(task => task.Result == str_test_demo_blazor.Domain.TestTaskResult.Fail) ?? 0;
+    private int NaCount => _testRun?.TestTaskRuns.Count(task => task.Result == str_test_demo_blazor.Domain.TestTaskResult.NA) ?? 0;
+
+    private IReadOnlyList<string> PhotoPaths =>
+        _testRun?.TestTaskRuns
+            .SelectMany(task => task.PhotoSvgPaths)
+            .Distinct()
+            .ToList() ?? [];
+
+    protected override void OnParametersSet()
     {
-        await Js.InvokeVoidAsync("alert", "Demo only: certificate generation will be wired to PDF output later.");
+        _testRun = DemoData.FindTestRun(TestId);
+
+        if (_testRun is null || _testRun.Status != str_test_demo_blazor.Domain.TestRunStatus.Completed)
+        {
+            _testRun = null;
+            _asset = null;
+            _template = null;
+            return;
+        }
+
+        _asset = DemoData.FindAsset(_testRun.AssetId);
+        _template = DemoData.FindTemplate(_testRun.TemplateId);
     }
+
+    private async Task Print() => await Js.InvokeVoidAsync("print");
+
+    private static string ToWebPath(string path) => path.StartsWith('/') ? path : $"/{path}";
 }
