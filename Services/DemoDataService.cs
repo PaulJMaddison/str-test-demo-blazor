@@ -76,9 +76,10 @@ public class DemoDataService
 
     private static List<TestTemplate> SeedTemplates() =>
     [
-        BuildTemplate("Daily Safety Walkdown", 1, "Checklist"),
-        BuildTemplate("Weekly Performance Check", 7, "Performance"),
-        BuildTemplate("Monthly Calibration", 30, "Calibration")
+        BuildTemplate("Calibration Test", 30, "Calibration"),
+        BuildTemplate("Visual Inspection", 7, "Inspection"),
+        BuildTemplate("Safety Compliance Test", 14, "Safety"),
+        BuildTemplate("Functional Verification", 30, "Functional")
     ];
 
     private static TestTemplate BuildTemplate(string name, int frequencyDays, string prefix)
