@@ -1,11 +1,12 @@
 @page "/run-test"
 @page "/run-test/{TestId:guid}"
 @inject NavigationManager Navigation
+@inject str_test_demo_blazor.Services.DemoDataService DemoData
 
 <PageTitle>Run Test</PageTitle>
 
 <h1>Run Test</h1>
-<p class="text-muted">Demo-only test execution workflow with in-memory sample options.</p>
+<p class="text-muted">Demo-only test execution workflow with in-memory service data.</p>
 
 <section class="card shadow-sm mb-4">
     <div class="card-body">
@@ -13,19 +14,19 @@
         <div class="row g-3">
             <div class="col-12 col-md-6">
                 <label class="form-label" for="asset-select">Asset</label>
-                <select id="asset-select" class="form-select" @bind="SelectedAsset">
-                    @foreach (var asset in AssetOptions)
+                <select id="asset-select" class="form-select" @bind="SelectedAssetId">
+                    @foreach (var asset in DemoData.Assets)
                     {
-                        <option value="@asset">@asset</option>
+                        <option value="@asset.Id">@asset.AssetTag (@asset.Location)</option>
                     }
                 </select>
             </div>
             <div class="col-12 col-md-6">
                 <label class="form-label" for="template-select">Template</label>
-                <select id="template-select" class="form-select" @bind="SelectedTemplate">
-                    @foreach (var template in TemplateOptions)
+                <select id="template-select" class="form-select" @bind="SelectedTemplateId">
+                    @foreach (var template in DemoData.Templates)
                     {
-                        <option value="@template">@template</option>
+                        <option value="@template.Id">@template.Name</option>
                     }
                 </select>
             </div>
@@ -36,14 +37,19 @@
     </div>
 </section>
 
-@if (TestId is Guid guid)
+@if (CurrentRun is not null)
 {
+    var asset = DemoData.FindAsset(CurrentRun.AssetId);
+    var template = DemoData.FindTemplate(CurrentRun.TemplateId);
+
     <section class="card shadow-sm">
         <div class="card-body">
             <h2 class="h5">Demo Test Session</h2>
-            <p class="mb-1"><strong>Test ID:</strong> @guid</p>
-            <p class="mb-1"><strong>Asset:</strong> @SelectedAsset</p>
-            <p class="mb-0"><strong>Template:</strong> @SelectedTemplate</p>
+            <p class="mb-1"><strong>Test ID:</strong> @CurrentRun.Id</p>
+            <p class="mb-1"><strong>Asset:</strong> @asset?.AssetTag</p>
+            <p class="mb-1"><strong>Template:</strong> @template?.Name</p>
+            <p class="mb-1"><strong>Status:</strong> @CurrentRun.Status</p>
+            <p class="mb-0"><strong>Task Count:</strong> @CurrentRun.TestTaskRuns.Count</p>
         </div>
     </section>
 }
@@ -52,15 +58,21 @@
     [Parameter]
     public Guid? TestId { get; set; }
 
-    private readonly List<string> AssetOptions = ["Boiler #2", "Pump Station 7", "Generator C", "Compressor A"];
-    private readonly List<string> TemplateOptions = ["Safety Inspection", "Performance Check", "Calibration"];
+    private Guid SelectedAssetId { get; set; }
+    private Guid SelectedTemplateId { get; set; }
 
-    private string SelectedAsset { get; set; } = "Boiler #2";
-    private string SelectedTemplate { get; set; } = "Safety Inspection";
+    private str_test_demo_blazor.Domain.TestRun? CurrentRun =>
+        TestId is Guid id ? DemoData.TestRuns.FirstOrDefault(run => run.Id == id) : null;
+
+    protected override void OnInitialized()
+    {
+        SelectedAssetId = DemoData.Assets.First().Id;
+        SelectedTemplateId = DemoData.Templates.First().Id;
+    }
 
     private void StartTest()
     {
-        var testId = Guid.NewGuid();
-        Navigation.NavigateTo($"/run-test/{testId}");
+        var run = DemoData.CreateTestRun(SelectedAssetId, SelectedTemplateId);
+        Navigation.NavigateTo($"/run-test/{run.Id}");
     }
 }
