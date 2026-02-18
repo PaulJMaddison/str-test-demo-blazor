@@ -1,0 +1,67 @@
+@page "/assets"
+
+<PageTitle>Assets</PageTitle>
+
+<h1>Assets</h1>
+<p class="text-muted">Demo-only asset catalog displayed from in-memory sample data.</p>
+
+<section class="card shadow-sm">
+    <div class="card-body">
+        <div class="row g-3 align-items-end mb-3">
+            <div class="col-12 col-md-6 col-lg-4">
+                <label class="form-label" for="asset-search">Search assets</label>
+                <input id="asset-search" class="form-control" type="search" @bind="SearchTerm" placeholder="Filter by tag, serial, type, location, status" />
+            </div>
+        </div>
+
+        <div class="table-responsive">
+            <table class="table table-striped align-middle mb-0">
+                <thead>
+                    <tr>
+                        <th>Asset Tag</th>
+                        <th>Serial</th>
+                        <th>Type</th>
+                        <th>Location</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var asset in FilteredAssets)
+                    {
+                        <tr>
+                            <td>@asset.AssetTag</td>
+                            <td>@asset.Serial</td>
+                            <td>@asset.Type</td>
+                            <td>@asset.Location</td>
+                            <td>@asset.Status</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</section>
+
+@code {
+    private string SearchTerm { get; set; } = string.Empty;
+
+    private IEnumerable<AssetRow> FilteredAssets => AssetRows.Where(asset =>
+        string.IsNullOrWhiteSpace(SearchTerm)
+        || Contains(asset.AssetTag)
+        || Contains(asset.Serial)
+        || Contains(asset.Type)
+        || Contains(asset.Location)
+        || Contains(asset.Status));
+
+    private bool Contains(string value) => value.Contains(SearchTerm, StringComparison.OrdinalIgnoreCase);
+
+    private readonly List<AssetRow> AssetRows =
+    [
+        new("AST-1001", "SN-39210", "Pressure Gauge", "Plant 1", "Active"),
+        new("AST-1002", "SN-17421", "Flow Meter", "Plant 2", "Maintenance"),
+        new("AST-1003", "SN-77152", "Compressor", "Warehouse", "Active"),
+        new("AST-1004", "SN-68290", "Valve", "Plant 1", "Inactive")
+    ];
+
+    private record AssetRow(string AssetTag, string Serial, string Type, string Location, string Status);
+}
