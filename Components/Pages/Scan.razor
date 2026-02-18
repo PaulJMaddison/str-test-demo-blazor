@@ -1,0 +1,130 @@
+@page "/scan"
+@rendermode InteractiveServer
+@inject str_test_demo_blazor.Services.DemoDataService DemoData
+@inject NavigationManager Navigation
+
+<PageTitle>Scan Asset Barcode</PageTitle>
+
+<h1>Scan Asset Barcode</h1>
+<p class="text-muted">Demo scan flow using in-memory asset and template data.</p>
+
+<section class="card str-card mb-4">
+    <div class="card-body">
+        <img class="scan-frame mb-3" src="demo-images/scan-frame.svg" alt="Decorative scan frame" />
+        <form class="row g-3 align-items-end" @onsubmit="HandleScanSubmit">
+            <div class="col-12 col-lg-8">
+                <label class="form-label" for="asset-barcode-input">Asset number or barcode</label>
+                <input id="asset-barcode-input"
+                       class="form-control"
+                       @bind="ScannedAssetTag"
+                       @bind:event="oninput"
+                       placeholder="e.g. AST-1001"
+                       autocomplete="off" />
+                <p class="form-text mb-0">Enter an asset tag from demo data. Example: AST-1001</p>
+            </div>
+            <div class="col-12 col-lg-auto">
+                <button class="btn btn-primary" type="submit">Scan (demo)</button>
+            </div>
+        </form>
+
+        @if (!string.IsNullOrWhiteSpace(ScanError))
+        {
+            <p class="text-danger mt-3 mb-0">@ScanError</p>
+        }
+
+        @if (MatchedAsset is not null)
+        {
+            <section class="card border-success-subtle bg-success-subtle mt-4">
+                <div class="card-body">
+                    <h2 class="h5 mb-3">Asset Found</h2>
+                    <dl class="row mb-0">
+                        <dt class="col-sm-4">Asset Number</dt>
+                        <dd class="col-sm-8">@MatchedAsset.AssetTag</dd>
+
+                        <dt class="col-sm-4">Type</dt>
+                        <dd class="col-sm-8">@MatchedAsset.Type</dd>
+
+                        <dt class="col-sm-4">Description</dt>
+                        <dd class="col-sm-8">@GetDescription(MatchedAsset)</dd>
+
+                        <dt class="col-sm-4">Location</dt>
+                        <dd class="col-sm-8">@MatchedAsset.Location</dd>
+
+                        <dt class="col-sm-4">Last Test Date</dt>
+                        <dd class="col-sm-8">@GetLastTestDate(MatchedAsset.Id)</dd>
+                    </dl>
+                </div>
+            </section>
+
+            <div class="row g-3 align-items-end mt-1">
+                <div class="col-12 col-md-8">
+                    <label class="form-label" for="scan-template-select">Test template</label>
+                    <select id="scan-template-select" class="form-select" @bind="SelectedTemplateId">
+                        @foreach (var template in DemoData.Templates)
+                        {
+                            <option value="@template.Id">@template.Name</option>
+                        }
+                    </select>
+                </div>
+                <div class="col-12 col-md-auto">
+                    <button type="button" class="btn btn-success" @onclick="CreateTest">Create Test</button>
+                </div>
+            </div>
+        }
+    </div>
+</section>
+
+@code {
+    private string ScannedAssetTag { get; set; } = string.Empty;
+    private string? ScanError { get; set; }
+    private str_test_demo_blazor.Domain.Asset? MatchedAsset { get; set; }
+    private Guid SelectedTemplateId { get; set; }
+
+    protected override void OnInitialized()
+    {
+        SelectedTemplateId = DemoData.Templates.First().Id;
+    }
+
+    private void HandleScanSubmit()
+    {
+        ScanError = null;
+        MatchedAsset = null;
+
+        if (string.IsNullOrWhiteSpace(ScannedAssetTag))
+        {
+            ScanError = "Asset not found in demo data.";
+            return;
+        }
+
+        MatchedAsset = DemoData.Assets.FirstOrDefault(asset =>
+            asset.AssetTag.Equals(ScannedAssetTag.Trim(), StringComparison.OrdinalIgnoreCase));
+
+        if (MatchedAsset is null)
+        {
+            ScanError = "Asset not found in demo data.";
+        }
+    }
+
+    private void CreateTest()
+    {
+        if (MatchedAsset is null)
+        {
+            return;
+        }
+
+        Navigation.NavigateTo($"/run-test?assetTag={Uri.EscapeDataString(MatchedAsset.AssetTag)}&templateId={SelectedTemplateId}");
+    }
+
+    private string GetLastTestDate(Guid assetId)
+    {
+        var completedRun = DemoData.TestRuns
+            .Where(run => run.AssetId == assetId && run.CompletedAt is not null)
+            .OrderByDescending(run => run.CompletedAt)
+            .FirstOrDefault();
+
+        return completedRun?.CompletedAt?.ToString("yyyy-MM-dd") ?? "No prior tests";
+    }
+
+    private static string GetDescription(str_test_demo_blazor.Domain.Asset asset) =>
+        $"{asset.Type} (Serial {asset.Serial})";
+}

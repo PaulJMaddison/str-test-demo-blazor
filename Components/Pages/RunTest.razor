@@ -225,6 +225,9 @@ else
     [SupplyParameterFromQuery(Name = "assetTag")]
     public string? AssetTag { get; set; }
 
+    [SupplyParameterFromQuery(Name = "templateId")]
+    public Guid? TemplateId { get; set; }
+
     private readonly TimeSpan _tick = TimeSpan.FromSeconds(1);
     private readonly List<DateTime> _pauseEvents = [];
     private readonly string[] _photoPlaceholders =
@@ -270,14 +273,22 @@ else
             SelectedTaskId = CurrentRun.TestTaskRuns.FirstOrDefault()?.Id;
         }
 
-        if (CurrentRun is null && !string.IsNullOrWhiteSpace(AssetTag))
+        if (CurrentRun is null)
         {
-            var matchedAsset = DemoData.Assets.FirstOrDefault(asset =>
-                asset.AssetTag.Equals(AssetTag.Trim(), StringComparison.OrdinalIgnoreCase));
-
-            if (matchedAsset is not null)
+            if (!string.IsNullOrWhiteSpace(AssetTag))
             {
-                SelectedAssetId = matchedAsset.Id;
+                var matchedAsset = DemoData.Assets.FirstOrDefault(asset =>
+                    asset.AssetTag.Equals(AssetTag.Trim(), StringComparison.OrdinalIgnoreCase));
+
+                if (matchedAsset is not null)
+                {
+                    SelectedAssetId = matchedAsset.Id;
+                }
+            }
+
+            if (TemplateId is Guid templateId && DemoData.Templates.Any(template => template.Id == templateId))
+            {
+                SelectedTemplateId = templateId;
             }
         }
     }
