@@ -1,18 +1,105 @@
-.hbar-card {
+.hbar-chart {
+    --label-col: 160px;
+    --grid-color: #dbe5f3;
+    --axis-color: #7a8fae;
+    --bar-color: var(--str-primary, #3b82f6);
+    --track-color: #edf2fa;
     width: 100%;
 }
 
-.hbar-svg {
+.hbar-chart__rows {
+    border-left: 1.5px solid var(--axis-color);
+    border-bottom: 1.5px solid var(--axis-color);
+    padding-bottom: 0.25rem;
+}
+
+.hbar-chart__row {
+    display: grid;
+    grid-template-columns: var(--label-col) 1fr;
+    align-items: center;
+    gap: 0.6rem;
+    min-height: 38px;
+    margin-bottom: 0.35rem;
+}
+
+.hbar-chart__label {
+    text-align: right;
+    padding-right: 0.35rem;
+    color: #1f2e43;
+    font-size: 0.8rem;
+    font-weight: 600;
+}
+
+.hbar-chart__plot {
+    position: relative;
+    min-height: 20px;
+    background-image: linear-gradient(to right, var(--grid-color) 1px, transparent 1px);
+    background-size: 25% 100%;
+}
+
+.hbar-chart__track,
+.hbar-chart__fill {
+    position: absolute;
+    left: 0;
+    top: 1px;
+    height: 18px;
+    border-radius: 4px;
+}
+
+.hbar-chart__track {
     width: 100%;
-    height: auto;
-    display: block;
+    background: var(--track-color);
 }
 
-.hbar-label {
-    fill: var(--str-text-muted, #64748b);
-    font-size: 12px;
+.hbar-chart__fill {
+    background: var(--bar-color);
 }
 
-.hbar-bar {
-    fill: var(--str-primary, #3b82f6);
+.hbar-chart__value {
+    position: absolute;
+    top: 0;
+    left: calc(100% + 0.45rem);
+    color: #1f2e43;
+    font-size: 0.78rem;
+    font-weight: 700;
+    white-space: nowrap;
+}
+
+.hbar-chart__axis {
+    margin-left: calc(var(--label-col) + 0.6rem);
+    position: relative;
+    height: 2.2rem;
+}
+
+.hbar-chart__tick {
+    position: absolute;
+    transform: translateX(-50%);
+    top: 0;
+    color: #556b88;
+    font-size: 0.74rem;
+    font-weight: 600;
+}
+
+.hbar-chart__axis-title {
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+    bottom: 0;
+    color: #556b88;
+    font-size: 0.75rem;
+    font-weight: 600;
+}
+
+@media (max-width: 768px) {
+    .hbar-chart {
+        --label-col: 120px;
+    }
+
+    .hbar-chart__label {
+        font-size: 0.74rem;
+    }
+
+    .hbar-chart__value {
+        font-size: 0.72rem;
+    }
 }

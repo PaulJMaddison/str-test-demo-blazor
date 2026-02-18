@@ -70,6 +70,74 @@
     grid-column: 1 / -1;
 }
 
+.chart-surface {
+    border: 1px solid #d7e2f2;
+    border-radius: 12px;
+    background: #fff;
+    padding: 0.9rem;
+}
+
+.chart-surface--bar {
+    min-height: 320px;
+}
+
+.chart-surface--status {
+    min-height: 340px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding-inline: 1.2rem;
+}
+
+.chart-surface--workload {
+    min-height: 240px;
+}
+
+.chart-insights {
+    margin: 0.85rem 0 0;
+    padding-left: 1.1rem;
+    color: #334155;
+    font-size: 0.88rem;
+}
+
+.chart-insights li + li {
+    margin-top: 0.3rem;
+}
+
+.chart-insights--split {
+    list-style: none;
+    padding-left: 0;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 0.4rem 0.9rem;
+}
+
+.chart-insights--split li {
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    padding: 0.35rem 0.55rem;
+    display: flex;
+    justify-content: space-between;
+    gap: 0.6rem;
+    align-items: center;
+}
+
+.chart-note {
+    margin-top: 0.65rem;
+    color: #64748b;
+    font-size: 0.84rem;
+}
+
+@media (min-width: 992px) {
+    .chart-grid {
+        grid-template-columns: minmax(300px, 1fr) minmax(520px, 1.65fr);
+    }
+
+    .chart-grid__status {
+        min-width: 0;
+    }
+}
+
 .recent-tests__list {
     list-style: none;
     margin: 0;
