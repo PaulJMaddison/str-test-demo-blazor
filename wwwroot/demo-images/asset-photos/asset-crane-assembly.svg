@@ -1,0 +1,172 @@
+<!-- filename: asset-crane-assembly.svg -->
+<svg width="1200" height="800" viewBox="0 0 1200 800" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="bgBay2" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#2e333a"/>
+      <stop offset="0.5" stop-color="#1f242b"/>
+      <stop offset="1" stop-color="#151a20"/>
+    </linearGradient>
+
+    <radialGradient id="lightPool2" cx="55%" cy="30%" r="70%">
+      <stop offset="0" stop-color="#ffffff" stop-opacity="0.10"/>
+      <stop offset="0.55" stop-color="#ffffff" stop-opacity="0.04"/>
+      <stop offset="1" stop-color="#ffffff" stop-opacity="0"/>
+    </radialGradient>
+
+    <radialGradient id="vignette2" cx="50%" cy="45%" r="78%">
+      <stop offset="0" stop-color="#000000" stop-opacity="0"/>
+      <stop offset="0.72" stop-color="#000000" stop-opacity="0.14"/>
+      <stop offset="1" stop-color="#000000" stop-opacity="0.45"/>
+    </radialGradient>
+
+    <linearGradient id="metal2" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#7e8893"/>
+      <stop offset="0.25" stop-color="#4b5560"/>
+      <stop offset="0.6" stop-color="#2b343e"/>
+      <stop offset="1" stop-color="#8a94a0"/>
+    </linearGradient>
+
+    <linearGradient id="metalDark2" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#1b222a"/>
+      <stop offset="0.55" stop-color="#0f151c"/>
+      <stop offset="1" stop-color="#27303a"/>
+    </linearGradient>
+
+    <linearGradient id="cable2" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#1a1f26"/>
+      <stop offset="1" stop-color="#05080c"/>
+    </linearGradient>
+
+    <linearGradient id="tagRed2" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#ff6b6b"/>
+      <stop offset="0.6" stop-color="#c72d2d"/>
+      <stop offset="1" stop-color="#a71f1f"/>
+    </linearGradient>
+
+    <pattern id="grain2" width="140" height="140" patternUnits="userSpaceOnUse">
+      <rect width="140" height="140" fill="transparent"/>
+      <circle cx="10" cy="18" r="1.0" fill="#ffffff" opacity="0.04"/>
+      <circle cx="28" cy="35" r="0.9" fill="#ffffff" opacity="0.035"/>
+      <circle cx="50" cy="22" r="1.1" fill="#ffffff" opacity="0.03"/>
+      <circle cx="73" cy="40" r="0.8" fill="#ffffff" opacity="0.03"/>
+      <circle cx="96" cy="19" r="1.0" fill="#ffffff" opacity="0.03"/>
+      <circle cx="122" cy="36" r="0.9" fill="#ffffff" opacity="0.03"/>
+      <circle cx="18" cy="64" r="0.9" fill="#ffffff" opacity="0.03"/>
+      <circle cx="41" cy="82" r="1.2" fill="#ffffff" opacity="0.035"/>
+      <circle cx="68" cy="70" r="0.8" fill="#ffffff" opacity="0.03"/>
+      <circle cx="92" cy="94" r="1.0" fill="#ffffff" opacity="0.03"/>
+      <circle cx="116" cy="78" r="1.2" fill="#ffffff" opacity="0.03"/>
+      <circle cx="130" cy="102" r="0.9" fill="#ffffff" opacity="0.03"/>
+      <circle cx="12" cy="122" r="0.8" fill="#ffffff" opacity="0.03"/>
+      <circle cx="36" cy="128" r="1.1" fill="#ffffff" opacity="0.03"/>
+      <circle cx="62" cy="118" r="0.9" fill="#ffffff" opacity="0.03"/>
+      <circle cx="88" cy="126" r="1.2" fill="#ffffff" opacity="0.035"/>
+      <circle cx="110" cy="120" r="0.8" fill="#ffffff" opacity="0.03"/>
+      <circle cx="128" cy="132" r="1.0" fill="#ffffff" opacity="0.03"/>
+      <circle cx="22" cy="10" r="0.7" fill="#000000" opacity="0.035"/>
+      <circle cx="66" cy="52" r="0.8" fill="#000000" opacity="0.03"/>
+      <circle cx="102" cy="58" r="0.7" fill="#000000" opacity="0.03"/>
+      <circle cx="54" cy="104" r="0.8" fill="#000000" opacity="0.03"/>
+      <circle cx="118" cy="110" r="0.7" fill="#000000" opacity="0.03"/>
+    </pattern>
+
+    <linearGradient id="overlayBar2" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#000000" stop-opacity="0.55"/>
+      <stop offset="1" stop-color="#000000" stop-opacity="0.72"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Background -->
+  <rect x="0" y="0" width="1200" height="800" fill="url(#bgBay2)"/>
+  <rect x="0" y="0" width="1200" height="800" fill="url(#lightPool2)"/>
+
+  <!-- Warehouse beams / ceiling hints -->
+  <g opacity="0.55">
+    <polygon points="0,85 1200,40 1200,90 0,135" fill="#0f141a" opacity="0.7"/>
+    <polygon points="0,140 1200,95 1200,125 0,170" fill="#232a33" opacity="0.45"/>
+    <polygon points="90,45 120,42 210,190 180,195" fill="#1a2129" opacity="0.55"/>
+    <polygon points="320,38 350,36 430,175 400,180" fill="#1a2129" opacity="0.55"/>
+    <polygon points="560,30 590,28 655,165 625,170" fill="#1a2129" opacity="0.55"/>
+    <polygon points="820,22 850,20 910,155 880,160" fill="#1a2129" opacity="0.55"/>
+    <polygon points="1040,18 1070,16 1130,145 1100,150" fill="#1a2129" opacity="0.55"/>
+  </g>
+
+  <!-- Distant structures blur -->
+  <g opacity="0.40">
+    <polygon points="70,420 350,395 350,555 70,580" fill="#0d1218"/>
+    <polygon points="880,380 1140,360 1140,520 880,540" fill="#0d1218"/>
+    <polygon points="420,430 770,405 770,610 420,640" fill="#111821" opacity="0.9"/>
+  </g>
+
+  <!-- Crane assembly -->
+  <!-- Boom/arm silhouette (slight perspective) -->
+  <polygon points="160,250 1000,175 1020,220 180,300" fill="url(#metal2)" opacity="0.96"/>
+  <polygon points="180,300 1020,220 1030,238 190,320" fill="#000000" opacity="0.18"/>
+
+  <!-- Trolley block housing -->
+  <polygon points="650,245 780,233 790,302 660,315" fill="url(#metalDark2)" opacity="0.98"/>
+  <polygon points="660,315 790,302 796,320 666,334" fill="#000000" opacity="0.22"/>
+  <polygon points="665,258 772,248 779,294 672,304" fill="#0f151c" opacity="0.55"/>
+
+  <!-- Cable lines -->
+  <path d="M720 315 C720 360, 720 410, 720 460" stroke="url(#cable2)" stroke-width="5" opacity="0.85" fill="none" stroke-linecap="round"/>
+  <path d="M735 313 C735 360, 736 412, 736 470" stroke="url(#cable2)" stroke-width="3.5" opacity="0.78" fill="none" stroke-linecap="round"/>
+
+  <!-- Hook block -->
+  <polygon points="690,455 760,448 770,520 700,528" fill="url(#metal2)" opacity="0.98"/>
+  <polygon points="700,528 770,520 776,538 706,546" fill="#000000" opacity="0.22"/>
+  <rect x="700" y="474" width="62" height="16" fill="#0f151c" opacity="0.55"/>
+  <circle cx="715" cy="466" r="6" fill="#0f151c" opacity="0.7"/>
+  <circle cx="745" cy="463" r="6" fill="#0f151c" opacity="0.7"/>
+
+  <!-- Hook -->
+  <path d="M730 545
+           C720 560, 720 582, 740 592
+           C758 601, 767 620, 755 637
+           C742 656, 715 652, 707 633"
+        fill="none" stroke="#0b1016" stroke-width="10" opacity="0.9" stroke-linecap="round"/>
+  <path d="M707 633 C702 620, 710 610, 724 612" fill="none" stroke="#000000" stroke-width="6" opacity="0.35" stroke-linecap="round"/>
+
+  <!-- Safety chain -->
+  <g opacity="0.8">
+    <path d="M760 548 C785 560, 805 575, 820 598" fill="none" stroke="#151b22" stroke-width="4" stroke-linecap="round"/>
+    <ellipse cx="775" cy="560" rx="10" ry="6" fill="none" stroke="#0b1016" stroke-width="3"/>
+    <ellipse cx="794" cy="574" rx="10" ry="6" fill="none" stroke="#0b1016" stroke-width="3"/>
+    <ellipse cx="812" cy="590" rx="10" ry="6" fill="none" stroke="#0b1016" stroke-width="3"/>
+    <ellipse cx="827" cy="606" rx="10" ry="6" fill="none" stroke="#0b1016" stroke-width="3"/>
+  </g>
+
+  <!-- Red inspection tag hanging from hook -->
+  <g>
+    <path d="M708 604 C692 614, 680 630, 678 650" fill="none" stroke="#2a2f36" stroke-width="3" opacity="0.75"/>
+    <polygon points="650,630 705,623 720,675 665,682" fill="url(#tagRed2)" opacity="0.96"/>
+    <polygon points="665,682 720,675 726,690 671,697" fill="#000000" opacity="0.18"/>
+    <circle cx="690" cy="635" r="6" fill="#2a2a2a" opacity="0.85"/>
+    <circle cx="690" cy="635" r="3" fill="#cfd3d7" opacity="0.25"/>
+    <text x="662" y="666" font-family="Arial, sans-serif" font-size="14" fill="#ffffff" opacity="0.75">INSPECT</text>
+  </g>
+
+  <!-- Ground shadow under hook area -->
+  <ellipse cx="740" cy="675" rx="170" ry="40" fill="#000000" opacity="0.34"/>
+  <ellipse cx="740" cy="682" rx="135" ry="30" fill="#000000" opacity="0.18"/>
+
+  <!-- Top-left label -->
+  <g>
+    <rect x="22" y="18" width="190" height="34" rx="8" fill="#000000" opacity="0.45"/>
+    <text x="34" y="41" font-family="Arial, sans-serif" font-size="16" fill="#ffffff" opacity="0.92" letter-spacing="0.5">DEMO PHOTO (SVG)</text>
+  </g>
+
+  <!-- Grain overlay -->
+  <rect x="0" y="0" width="1200" height="800" fill="url(#grain2)" opacity="0.9"/>
+
+  <!-- Vignette -->
+  <rect x="0" y="0" width="1200" height="800" fill="url(#vignette2)"/>
+
+  <!-- Bottom overlay strip -->
+  <g>
+    <rect x="0" y="720" width="1200" height="80" fill="url(#overlayBar2)"/>
+    <text x="38" y="768" font-family="Arial, sans-serif" font-size="22" fill="#ffffff" opacity="0.92">Asset Tag: ASSET-20958</text>
+    <text x="420" y="768" font-family="Arial, sans-serif" font-size="22" fill="#ffffff" opacity="0.88">Location: Demo Location</text>
+    <text x="840" y="768" font-family="Arial, sans-serif" font-size="22" fill="#ffffff" opacity="0.88">Timestamp: 2026-02-18 14:34</text>
+  </g>
+</svg>

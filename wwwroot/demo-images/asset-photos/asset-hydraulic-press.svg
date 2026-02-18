@@ -1,0 +1,198 @@
+<!-- filename: asset-hydraulic-press.svg -->
+<svg width="1200" height="800" viewBox="0 0 1200 800" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="bgWall1" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#2a2f36"/>
+      <stop offset="0.55" stop-color="#1f242b"/>
+      <stop offset="1" stop-color="#171b21"/>
+    </linearGradient>
+
+    <linearGradient id="floor1" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#171b20"/>
+      <stop offset="0.45" stop-color="#12161a"/>
+      <stop offset="1" stop-color="#0f1317"/>
+    </linearGradient>
+
+    <radialGradient id="vignette1" cx="50%" cy="45%" r="75%">
+      <stop offset="0" stop-color="#000000" stop-opacity="0"/>
+      <stop offset="0.7" stop-color="#000000" stop-opacity="0.12"/>
+      <stop offset="1" stop-color="#000000" stop-opacity="0.42"/>
+    </radialGradient>
+
+    <linearGradient id="steel1" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#6a747f"/>
+      <stop offset="0.25" stop-color="#3f4852"/>
+      <stop offset="0.55" stop-color="#2e3640"/>
+      <stop offset="1" stop-color="#818b96"/>
+    </linearGradient>
+
+    <linearGradient id="steelDark1" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#2a323c"/>
+      <stop offset="0.5" stop-color="#1f2730"/>
+      <stop offset="1" stop-color="#343d48"/>
+    </linearGradient>
+
+    <linearGradient id="pressFace1" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#4c5661"/>
+      <stop offset="0.35" stop-color="#2f3842"/>
+      <stop offset="1" stop-color="#1e262f"/>
+    </linearGradient>
+
+    <linearGradient id="highlightSoft1" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#ffffff" stop-opacity="0"/>
+      <stop offset="0.45" stop-color="#ffffff" stop-opacity="0.12"/>
+      <stop offset="0.7" stop-color="#ffffff" stop-opacity="0.06"/>
+      <stop offset="1" stop-color="#ffffff" stop-opacity="0"/>
+    </linearGradient>
+
+    <pattern id="grain1" width="120" height="120" patternUnits="userSpaceOnUse">
+      <rect width="120" height="120" fill="transparent"/>
+      <circle cx="8" cy="14" r="1.1" fill="#ffffff" opacity="0.05"/>
+      <circle cx="22" cy="36" r="0.9" fill="#ffffff" opacity="0.04"/>
+      <circle cx="41" cy="19" r="1.0" fill="#ffffff" opacity="0.035"/>
+      <circle cx="58" cy="44" r="0.8" fill="#ffffff" opacity="0.03"/>
+      <circle cx="73" cy="27" r="1.2" fill="#ffffff" opacity="0.04"/>
+      <circle cx="94" cy="16" r="0.9" fill="#ffffff" opacity="0.03"/>
+      <circle cx="110" cy="38" r="1.0" fill="#ffffff" opacity="0.03"/>
+      <circle cx="12" cy="62" r="0.9" fill="#ffffff" opacity="0.03"/>
+      <circle cx="28" cy="79" r="1.1" fill="#ffffff" opacity="0.04"/>
+      <circle cx="47" cy="66" r="0.8" fill="#ffffff" opacity="0.03"/>
+      <circle cx="66" cy="92" r="1.0" fill="#ffffff" opacity="0.035"/>
+      <circle cx="84" cy="74" r="1.2" fill="#ffffff" opacity="0.03"/>
+      <circle cx="103" cy="86" r="0.9" fill="#ffffff" opacity="0.03"/>
+      <circle cx="115" cy="64" r="1.1" fill="#ffffff" opacity="0.03"/>
+      <circle cx="6" cy="108" r="0.8" fill="#ffffff" opacity="0.03"/>
+      <circle cx="24" cy="104" r="1.0" fill="#ffffff" opacity="0.035"/>
+      <circle cx="44" cy="112" r="0.9" fill="#ffffff" opacity="0.03"/>
+      <circle cx="63" cy="106" r="1.2" fill="#ffffff" opacity="0.04"/>
+      <circle cx="82" cy="110" r="0.8" fill="#ffffff" opacity="0.03"/>
+      <circle cx="100" cy="102" r="1.0" fill="#ffffff" opacity="0.03"/>
+      <circle cx="112" cy="114" r="0.9" fill="#ffffff" opacity="0.03"/>
+      <circle cx="18" cy="10" r="0.7" fill="#000000" opacity="0.035"/>
+      <circle cx="36" cy="52" r="0.8" fill="#000000" opacity="0.03"/>
+      <circle cx="76" cy="50" r="0.7" fill="#000000" opacity="0.03"/>
+      <circle cx="98" cy="58" r="0.9" fill="#000000" opacity="0.03"/>
+      <circle cx="52" cy="98" r="0.8" fill="#000000" opacity="0.03"/>
+      <circle cx="90" cy="104" r="0.7" fill="#000000" opacity="0.03"/>
+    </pattern>
+
+    <linearGradient id="overlayBar1" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#000000" stop-opacity="0.55"/>
+      <stop offset="1" stop-color="#000000" stop-opacity="0.72"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Background -->
+  <rect x="0" y="0" width="1200" height="800" fill="url(#bgWall1)"/>
+  <rect x="0" y="470" width="1200" height="330" fill="url(#floor1)"/>
+
+  <!-- Workshop blurred shelves & clutter (soft impression) -->
+  <g opacity="0.55">
+    <polygon points="70,180 360,160 360,330 70,350" fill="#0f141a" opacity="0.65"/>
+    <polygon points="90,195 340,180 340,210 90,225" fill="#26303a" opacity="0.55"/>
+    <polygon points="110,235 350,220 350,250 110,265" fill="#1f2832" opacity="0.5"/>
+    <polygon points="95,280 325,265 325,295 95,310" fill="#1b232c" opacity="0.55"/>
+
+    <polygon points="830,150 1140,175 1140,355 830,330" fill="#0f141a" opacity="0.62"/>
+    <polygon points="860,185 1120,205 1120,235 860,215" fill="#25303a" opacity="0.52"/>
+    <polygon points="850,240 1100,260 1100,295 850,275" fill="#1e2731" opacity="0.5"/>
+    <polygon points="870,300 1130,320 1130,345 870,325" fill="#1a222b" opacity="0.52"/>
+  </g>
+
+  <!-- Ambient light patch -->
+  <ellipse cx="620" cy="220" rx="520" ry="240" fill="#ffffff" opacity="0.06"/>
+
+  <!-- Hydraulic press (slight perspective) -->
+  <!-- Ground shadow -->
+  <ellipse cx="650" cy="585" rx="285" ry="58" fill="#000000" opacity="0.38"/>
+  <ellipse cx="650" cy="595" rx="240" ry="44" fill="#000000" opacity="0.20"/>
+
+  <g>
+    <!-- Rear frame shadow -->
+    <polygon points="460,190 840,165 870,610 490,642" fill="#000000" opacity="0.25"/>
+
+    <!-- Main frame outer -->
+    <polygon points="430,170 830,140 865,640 465,675" fill="url(#steel1)"/>
+
+    <!-- Inner opening -->
+    <polygon points="495,222 770,200 795,595 520,620" fill="#121a22" opacity="0.92"/>
+
+    <!-- Left column face -->
+    <polygon points="455,175 520,170 555,675 490,680" fill="url(#steelDark1)" opacity="0.95"/>
+    <!-- Right column face -->
+    <polygon points="760,150 825,145 860,640 795,645" fill="url(#steelDark1)" opacity="0.95"/>
+
+    <!-- Crosshead / top beam -->
+    <polygon points="440,168 830,140 822,190 432,220" fill="url(#pressFace1)"/>
+    <polygon points="432,220 822,190 830,212 440,244" fill="#000000" opacity="0.18"/>
+
+    <!-- Pressing plate (top) -->
+    <polygon points="545,280 730,265 744,310 559,325" fill="#2a323b" opacity="0.95"/>
+    <polygon points="559,325 744,310 750,332 565,346" fill="#000000" opacity="0.22"/>
+
+    <!-- Ram / cylinder -->
+    <polygon points="626,200 688,195 714,280 652,285" fill="#3a444f" opacity="0.95"/>
+    <polygon points="652,285 714,280 720,292 658,298" fill="#000000" opacity="0.20"/>
+    <polygon points="635,210 680,206 700,275 655,279" fill="#ffffff" opacity="0.08"/>
+
+    <!-- Bed / bottom platen -->
+    <polygon points="535,515 790,495 806,550 551,570" fill="#303a45" opacity="0.98"/>
+    <polygon points="551,570 806,550 812,568 557,590" fill="#000000" opacity="0.24"/>
+
+    <!-- Side braces -->
+    <polygon points="470,360 520,356 530,460 480,464" fill="#2c3540" opacity="0.9"/>
+    <polygon points="772,340 822,336 832,442 782,446" fill="#2c3540" opacity="0.9"/>
+
+    <!-- Control box -->
+    <polygon points="840,330 940,320 952,410 852,422" fill="#2b333d" opacity="0.98"/>
+    <polygon points="852,422 952,410 958,428 858,440" fill="#000000" opacity="0.22"/>
+    <polygon points="854,340 934,332 942,395 862,404" fill="#1a222b" opacity="0.88"/>
+    <circle cx="887" cy="367" r="7" fill="#2bd26b" opacity="0.9"/>
+    <circle cx="912" cy="364" r="7" fill="#f0c13b" opacity="0.9"/>
+    <circle cx="936" cy="361" r="7" fill="#e85b5b" opacity="0.9"/>
+
+    <!-- Hoses / pipes -->
+    <path d="M820 360 C780 360, 760 330, 720 322" fill="none" stroke="#0e141b" stroke-width="10" opacity="0.75" stroke-linecap="round"/>
+    <path d="M822 380 C785 390, 770 425, 742 450" fill="none" stroke="#0b1016" stroke-width="8" opacity="0.75" stroke-linecap="round"/>
+    <path d="M520 520 C500 540, 482 560, 460 575" fill="none" stroke="#0b1016" stroke-width="7" opacity="0.6" stroke-linecap="round"/>
+    <path d="M540 540 C510 560, 495 595, 472 620" fill="none" stroke="#0e141b" stroke-width="6" opacity="0.55" stroke-linecap="round"/>
+
+    <!-- Bolts / details -->
+    <g opacity="0.55">
+      <circle cx="500" cy="248" r="4" fill="#0e141a"/>
+      <circle cx="520" cy="248" r="4" fill="#0e141a"/>
+      <circle cx="790" cy="224" r="4" fill="#0e141a"/>
+      <circle cx="810" cy="224" r="4" fill="#0e141a"/>
+      <circle cx="505" cy="610" r="4" fill="#0e141a"/>
+      <circle cx="820" cy="590" r="4" fill="#0e141a"/>
+    </g>
+
+    <!-- Warning sticker -->
+    <polygon points="515,260 565,256 570,285 520,289" fill="#f2c400" opacity="0.95"/>
+    <polygon points="520,266 558,263 561,279 523,282" fill="#000000" opacity="0.12"/>
+    <text x="528" y="281" font-family="Arial, sans-serif" font-size="12" fill="#1b1b1b" opacity="0.75">!</text>
+
+    <!-- Subtle highlight wash -->
+    <polygon points="430,170 830,140 865,640 465,675" fill="url(#highlightSoft1)" opacity="0.55"/>
+  </g>
+
+  <!-- Top-left label -->
+  <g>
+    <rect x="22" y="18" width="190" height="34" rx="8" fill="#000000" opacity="0.45"/>
+    <text x="34" y="41" font-family="Arial, sans-serif" font-size="16" fill="#ffffff" opacity="0.92" letter-spacing="0.5">DEMO PHOTO (SVG)</text>
+  </g>
+
+  <!-- Grain overlay -->
+  <rect x="0" y="0" width="1200" height="800" fill="url(#grain1)" opacity="0.9"/>
+
+  <!-- Vignette -->
+  <rect x="0" y="0" width="1200" height="800" fill="url(#vignette1)"/>
+
+  <!-- Bottom overlay strip -->
+  <g>
+    <rect x="0" y="720" width="1200" height="80" fill="url(#overlayBar1)"/>
+    <text x="38" y="768" font-family="Arial, sans-serif" font-size="22" fill="#ffffff" opacity="0.92">Asset Tag: ASSET-10427</text>
+    <text x="420" y="768" font-family="Arial, sans-serif" font-size="22" fill="#ffffff" opacity="0.88">Location: Demo Location</text>
+    <text x="840" y="768" font-family="Arial, sans-serif" font-size="22" fill="#ffffff" opacity="0.88">Timestamp: 2026-02-18 14:32</text>
+  </g>
+</svg>

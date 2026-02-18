@@ -1,0 +1,185 @@
+<!-- filename: asset-compressor-unit.svg -->
+<svg width="1200" height="800" viewBox="0 0 1200 800" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="bgRoom3" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#2c3138"/>
+      <stop offset="0.52" stop-color="#1e232a"/>
+      <stop offset="1" stop-color="#141920"/>
+    </linearGradient>
+
+    <linearGradient id="floor3" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#141920"/>
+      <stop offset="0.45" stop-color="#10151b"/>
+      <stop offset="1" stop-color="#0d1117"/>
+    </linearGradient>
+
+    <radialGradient id="vignette3" cx="50%" cy="45%" r="78%">
+      <stop offset="0" stop-color="#000000" stop-opacity="0"/>
+      <stop offset="0.72" stop-color="#000000" stop-opacity="0.14"/>
+      <stop offset="1" stop-color="#000000" stop-opacity="0.45"/>
+    </radialGradient>
+
+    <linearGradient id="tankMetal3" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#3a424c"/>
+      <stop offset="0.22" stop-color="#6b7783"/>
+      <stop offset="0.45" stop-color="#2e3640"/>
+      <stop offset="0.7" stop-color="#515c67"/>
+      <stop offset="1" stop-color="#2a313a"/>
+    </linearGradient>
+
+    <linearGradient id="tankShadow3" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#000000" stop-opacity="0.05"/>
+      <stop offset="1" stop-color="#000000" stop-opacity="0.35"/>
+    </linearGradient>
+
+    <linearGradient id="motor3" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#5b6672"/>
+      <stop offset="0.35" stop-color="#2f3842"/>
+      <stop offset="1" stop-color="#6c7783"/>
+    </linearGradient>
+
+    <linearGradient id="pipe3" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#1a2027"/>
+      <stop offset="0.5" stop-color="#0f151c"/>
+      <stop offset="1" stop-color="#202833"/>
+    </linearGradient>
+
+    <radialGradient id="tankSpec3" cx="30%" cy="35%" r="55%">
+      <stop offset="0" stop-color="#ffffff" stop-opacity="0.22"/>
+      <stop offset="0.35" stop-color="#ffffff" stop-opacity="0.12"/>
+      <stop offset="1" stop-color="#ffffff" stop-opacity="0"/>
+    </radialGradient>
+
+    <pattern id="grain3" width="130" height="130" patternUnits="userSpaceOnUse">
+      <rect width="130" height="130" fill="transparent"/>
+      <circle cx="8" cy="16" r="1.0" fill="#ffffff" opacity="0.04"/>
+      <circle cx="22" cy="38" r="0.9" fill="#ffffff" opacity="0.035"/>
+      <circle cx="45" cy="22" r="1.1" fill="#ffffff" opacity="0.03"/>
+      <circle cx="66" cy="44" r="0.8" fill="#ffffff" opacity="0.03"/>
+      <circle cx="88" cy="18" r="1.0" fill="#ffffff" opacity="0.03"/>
+      <circle cx="112" cy="36" r="0.9" fill="#ffffff" opacity="0.03"/>
+      <circle cx="14" cy="64" r="0.9" fill="#ffffff" opacity="0.03"/>
+      <circle cx="36" cy="84" r="1.2" fill="#ffffff" opacity="0.035"/>
+      <circle cx="60" cy="70" r="0.8" fill="#ffffff" opacity="0.03"/>
+      <circle cx="84" cy="96" r="1.0" fill="#ffffff" opacity="0.03"/>
+      <circle cx="108" cy="78" r="1.2" fill="#ffffff" opacity="0.03"/>
+      <circle cx="124" cy="102" r="0.9" fill="#ffffff" opacity="0.03"/>
+      <circle cx="12" cy="118" r="0.8" fill="#ffffff" opacity="0.03"/>
+      <circle cx="34" cy="124" r="1.1" fill="#ffffff" opacity="0.03"/>
+      <circle cx="60" cy="114" r="0.9" fill="#ffffff" opacity="0.03"/>
+      <circle cx="86" cy="124" r="1.2" fill="#ffffff" opacity="0.035"/>
+      <circle cx="106" cy="118" r="0.8" fill="#ffffff" opacity="0.03"/>
+      <circle cx="122" cy="126" r="1.0" fill="#ffffff" opacity="0.03"/>
+      <circle cx="18" cy="10" r="0.7" fill="#000000" opacity="0.035"/>
+      <circle cx="62" cy="54" r="0.8" fill="#000000" opacity="0.03"/>
+      <circle cx="98" cy="58" r="0.7" fill="#000000" opacity="0.03"/>
+      <circle cx="52" cy="104" r="0.8" fill="#000000" opacity="0.03"/>
+      <circle cx="116" cy="110" r="0.7" fill="#000000" opacity="0.03"/>
+    </pattern>
+
+    <linearGradient id="overlayBar3" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#000000" stop-opacity="0.55"/>
+      <stop offset="1" stop-color="#000000" stop-opacity="0.72"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Background -->
+  <rect x="0" y="0" width="1200" height="800" fill="url(#bgRoom3)"/>
+  <rect x="0" y="520" width="1200" height="280" fill="url(#floor3)"/>
+
+  <!-- Wall panel hints -->
+  <g opacity="0.5">
+    <polygon points="90,160 480,135 480,355 90,380" fill="#0f151c" opacity="0.7"/>
+    <polygon points="110,180 460,158 460,200 110,222" fill="#252c35" opacity="0.55"/>
+    <polygon points="110,230 460,208 460,248 110,270" fill="#1c232c" opacity="0.55"/>
+    <polygon points="110,280 460,258 460,342 110,365" fill="#151c24" opacity="0.6"/>
+
+    <polygon points="760,150 1120,125 1120,350 760,375" fill="#0f151c" opacity="0.65"/>
+    <polygon points="780,172 1100,150 1100,210 780,232" fill="#252c35" opacity="0.52"/>
+    <polygon points="780,235 1100,215 1100,275 780,297" fill="#1b222b" opacity="0.52"/>
+    <polygon points="780,300 1100,280 1100,345 780,365" fill="#151c24" opacity="0.58"/>
+  </g>
+
+  <!-- Floor line -->
+  <path d="M0 520 L1200 520" stroke="#000000" stroke-width="2" opacity="0.45"/>
+
+  <!-- Compressor unit shadow -->
+  <ellipse cx="620" cy="600" rx="340" ry="65" fill="#000000" opacity="0.36"/>
+  <ellipse cx="620" cy="612" rx="280" ry="52" fill="#000000" opacity="0.20"/>
+
+  <!-- Tank (cylindrical, slight perspective) -->
+  <g>
+    <!-- Tank body -->
+    <ellipse cx="560" cy="480" rx="260" ry="70" fill="#222a33" opacity="0.55"/>
+    <rect x="300" y="480" width="520" height="200" fill="url(#tankMetal3)" opacity="0.98"/>
+    <ellipse cx="560" cy="680" rx="260" ry="70" fill="url(#tankMetal3)" opacity="0.98"/>
+    <ellipse cx="560" cy="680" rx="260" ry="70" fill="url(#tankShadow3)" opacity="0.55"/>
+
+    <!-- Subtle metallic highlight reflection -->
+    <ellipse cx="470" cy="575" rx="230" ry="150" fill="url(#tankSpec3)" opacity="0.95"/>
+    <path d="M360 510 C420 470, 520 455, 610 470" fill="none" stroke="#ffffff" stroke-width="3" opacity="0.10" stroke-linecap="round"/>
+
+    <!-- Tank seam / band -->
+    <rect x="300" y="560" width="520" height="10" fill="#0f151c" opacity="0.35"/>
+    <rect x="300" y="570" width="520" height="2" fill="#ffffff" opacity="0.05"/>
+
+    <!-- Feet -->
+    <polygon points="360,705 420,700 430,740 370,745" fill="#1a2027" opacity="0.9"/>
+    <polygon points="690,700 750,695 760,736 700,742" fill="#1a2027" opacity="0.9"/>
+  </g>
+
+  <!-- Motor housing with vents (mounted on right) -->
+  <g>
+    <polygon points="760,405 975,385 1000,505 785,528" fill="url(#motor3)" opacity="0.98"/>
+    <polygon points="785,528 1000,505 1006,525 791,548" fill="#000000" opacity="0.20"/>
+    <polygon points="780,418 950,402 970,490 800,508" fill="#1a2027" opacity="0.35"/>
+
+    <!-- Vents -->
+    <g opacity="0.65">
+      <polygon points="820,430 940,418 944,435 824,447" fill="#0d1218"/>
+      <polygon points="825,455 945,443 949,460 829,472" fill="#0d1218"/>
+      <polygon points="830,480 950,468 954,485 834,497" fill="#0d1218"/>
+    </g>
+
+    <!-- Pulley/belt hint -->
+    <ellipse cx="815" cy="515" rx="34" ry="22" fill="#0f151c" opacity="0.8"/>
+    <ellipse cx="815" cy="515" rx="18" ry="12" fill="#2a323b" opacity="0.7"/>
+  </g>
+
+  <!-- Pressure gauge -->
+  <g>
+    <circle cx="420" cy="500" r="28" fill="#1a2027" opacity="0.9"/>
+    <circle cx="420" cy="500" r="22" fill="#dfe5ea" opacity="0.22"/>
+    <circle cx="420" cy="500" r="18" fill="#0f151c" opacity="0.65"/>
+    <path d="M420 500 L435 490" stroke="#dfe5ea" stroke-width="2" opacity="0.55" stroke-linecap="round"/>
+    <circle cx="420" cy="500" r="2.5" fill="#dfe5ea" opacity="0.55"/>
+  </g>
+
+  <!-- Pipes -->
+  <g opacity="0.9">
+    <path d="M520 430 C560 420, 650 418, 740 420" fill="none" stroke="url(#pipe3)" stroke-width="10" stroke-linecap="round"/>
+    <path d="M740 420 C780 422, 820 430, 860 450" fill="none" stroke="url(#pipe3)" stroke-width="8" stroke-linecap="round"/>
+    <path d="M420 528 C410 560, 408 600, 420 642" fill="none" stroke="url(#pipe3)" stroke-width="8" stroke-linecap="round"/>
+    <path d="M420 642 C470 665, 520 676, 565 682" fill="none" stroke="url(#pipe3)" stroke-width="7" stroke-linecap="round"/>
+  </g>
+
+  <!-- Top-left label -->
+  <g>
+    <rect x="22" y="18" width="190" height="34" rx="8" fill="#000000" opacity="0.45"/>
+    <text x="34" y="41" font-family="Arial, sans-serif" font-size="16" fill="#ffffff" opacity="0.92" letter-spacing="0.5">DEMO PHOTO (SVG)</text>
+  </g>
+
+  <!-- Grain overlay -->
+  <rect x="0" y="0" width="1200" height="800" fill="url(#grain3)" opacity="0.9"/>
+
+  <!-- Vignette -->
+  <rect x="0" y="0" width="1200" height="800" fill="url(#vignette3)"/>
+
+  <!-- Bottom overlay strip -->
+  <g>
+    <rect x="0" y="720" width="1200" height="80" fill="url(#overlayBar3)"/>
+    <text x="38" y="768" font-family="Arial, sans-serif" font-size="22" fill="#ffffff" opacity="0.92">Asset Tag: ASSET-31706</text>
+    <text x="420" y="768" font-family="Arial, sans-serif" font-size="22" fill="#ffffff" opacity="0.88">Location: Demo Location</text>
+    <text x="840" y="768" font-family="Arial, sans-serif" font-size="22" fill="#ffffff" opacity="0.88">Timestamp: 2026-02-18 14:36</text>
+  </g>
+</svg>
