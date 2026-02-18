@@ -51,37 +51,33 @@ else
     var progressTotal = CurrentRun.TestTaskRuns.Count;
     var requiredCompleted = GetRequiredCompletedCount(CurrentRun, template);
     var requiredTotal = GetRequiredTotalCount(template);
-    var statusBadgeClass = GetDaysRemainingBadgeClass(dueDate);
 
     <section class="card str-card mb-4 run-test-header">
         <div class="card-body">
             <div class="run-test-header__top">
                 <div class="run-test-header__left">
-                    <a class="btn btn-outline-secondary" href="/dashboard" aria-label="Back to dashboard">← Back</a>
+                    <a class="btn btn-outline-secondary run-test-back-btn" href="/dashboard" aria-label="Back to dashboard">
+                        <span class="run-test-icon" aria-hidden="true">
+                            <svg viewBox="0 0 24 24" focusable="false">
+                                <path d="M14.7 5.3a1 1 0 0 1 0 1.4L10.41 11H20a1 1 0 1 1 0 2h-9.59l4.3 4.3a1 1 0 1 1-1.42 1.4l-6-6a1 1 0 0 1 0-1.4l6-6a1 1 0 0 1 1.41 0z"></path>
+                            </svg>
+                        </span>
+                        Back to Dashboard
+                    </a>
                     <div>
                         <p class="run-test-header__asset mb-1">@(asset?.AssetTag ?? "Unknown Asset")</p>
                         <p class="text-muted mb-0">@(asset is null ? "Asset details unavailable" : $"{asset.Type} • {asset.Location}")</p>
                     </div>
                 </div>
                 <div class="run-test-header__right">
-                    <p class="text-uppercase text-muted small mb-1">Timer</p>
-                    <p class="display-6 mb-2">@FormatElapsed(Elapsed)</p>
-                    <div class="d-flex gap-2 flex-wrap justify-content-end">
-                        @if (!_timerStarted)
-                        {
-                            <button class="btn btn-sm btn-primary" @onclick="StartTimer">Start</button>
-                        }
-                        else if (_timerRunning)
-                        {
-                            <button class="btn btn-sm btn-outline-secondary" @onclick="PauseTimer">Pause</button>
-                        }
-                        else
-                        {
-                            <button class="btn btn-sm btn-primary" @onclick="ResumeTimer">Resume</button>
-                        }
-
+                    <div class="timer-module">
+                        <p class="text-uppercase text-muted small mb-1 fw-semibold">Timer</p>
+                        <p class="timer-display mb-0">@FormatElapsed(Elapsed)</p>
+                    </div>
+                    <div class="run-test-header__actions">
+                        <button class="btn btn-primary" @onclick="ToggleTimer" disabled="@(CurrentRun.Status == str_test_demo_blazor.Domain.TestRunStatus.Completed)">@GetTimerButtonLabel()</button>
                         <button type="button"
-                                class="btn btn-sm btn-success complete-test-btn"
+                                class="btn btn-success complete-test-btn"
                                 disabled="@(CurrentRun.Status == str_test_demo_blazor.Domain.TestRunStatus.Completed)"
                                 @onclick="CompleteTest">
                             Complete Test
@@ -91,12 +87,12 @@ else
             </div>
 
             <div class="run-test-header__strip">
-                <span><strong>Test Type:</strong> @(template?.Name ?? "N/A")</span>
-                <span><strong>Due Date:</strong> @dueDate.ToString("yyyy-MM-dd")</span>
-                <span class="badge rounded-pill @statusBadgeClass">@GetDaysRemainingText(dueDate)</span>
-                <span><strong>Progress:</strong> @progressCompleted/@progressTotal tasks</span>
-                <span><strong>Required:</strong> @requiredCompleted/@requiredTotal</span>
-                <span><strong>Status:</strong> <span class="status-pill @GetRunStatusPillClass(CurrentRun)">@GetRunStatusLabel(CurrentRun)</span></span>
+                <div class="context-item"><span class="context-label">Test Type</span><span class="context-value">@(template?.Name ?? "N/A")</span></div>
+                <div class="context-item"><span class="context-label">Due Date</span><span class="context-value">@dueDate.ToString("yyyy-MM-dd")</span></div>
+                <div class="context-item"><span class="context-label">Days Remaining</span><span class="badge rounded-pill @GetDaysRemainingBadgeClass(dueDate)">@GetDaysRemainingText(dueDate)</span></div>
+                <div class="context-item"><span class="context-label">Progress</span><span class="context-value">@progressCompleted / @progressTotal tasks</span></div>
+                <div class="context-item"><span class="context-label">Required</span><span class="context-value">@requiredCompleted / @requiredTotal</span></div>
+                <div class="context-item"><span class="context-label">Status</span><span class="status-pill @GetRunStatusPillClass(CurrentRun, dueDate)">@GetRunStatusLabel(CurrentRun, dueDate)</span></div>
             </div>
         </div>
     </section>
@@ -111,119 +107,156 @@ else
         </section>
     }
 
-    <section class="row g-3 align-items-stretch">
-        <div class="col-12 col-lg-3">
-            <div class="card str-card h-100">
+    <section class="row g-3 align-items-start run-test-main-layout">
+        <div class="col-12 col-xl-4">
+            <div class="card str-card task-checklist-card">
                 <div class="card-body">
-                    <h2 class="h5">Tasks</h2>
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <h2 class="h5 mb-0">Task Checklist</h2>
+                        <span class="text-muted small">@progressCompleted / @progressTotal complete</span>
+                    </div>
+
+                    <div class="task-filter-row mb-3" role="group" aria-label="Task filters">
+                        @foreach (var filter in Enum.GetValues<TaskFilter>())
+                        {
+                            <button type="button"
+                                    class="btn @(SelectedFilter == filter ? "btn-primary" : "btn-outline-secondary")"
+                                    @onclick="() => SetFilter(filter)">
+                                @GetFilterLabel(filter)
+                            </button>
+                        }
+                    </div>
+
                     <div class="list-group task-list">
-                        @foreach (var task in CurrentRun.TestTaskRuns)
+                        @foreach (var task in GetFilteredTasks(CurrentRun, template))
                         {
                             var isSelected = task.Id == SelectedTaskId;
                             <button type="button"
-                                    class="list-group-item list-group-item-action d-flex justify-content-between align-items-center @(isSelected ? "active" : string.Empty)"
+                                    class="list-group-item list-group-item-action @(isSelected ? "active" : "")"
                                     @onclick="() => SelectTask(task.Id)">
-                                <span class="task-title-wrap">
-                                        <span>@task.Title</span>
+                                <div class="task-title-wrap">
+                                    <div class="task-title-row">
+                                        <span class="task-title">@task.Title</span>
                                         @if (IsTaskRequired(task, template))
                                         {
-                                            <span class="urgency-badge">Required</span>
+                                            <span class="badge text-bg-warning">Required</span>
                                         }
+                                    </div>
+                                    <span class="task-result-chip @GetTaskStatusClass(task)">
+                                        <span class="task-complete-dot"></span>@GetTaskResultLabel(task.Result)
                                     </span>
-                                    <span class="task-result-chip">
-                                        <span class="task-complete-dot @(task.Result == str_test_demo_blazor.Domain.TestTaskResult.NotRun ? string.Empty : "task-complete-dot--done")"></span>@task.Result
-                                    </span>
+                                </div>
                             </button>
                         }
                     </div>
                 </div>
             </div>
         </div>
-        <div class="col-12 col-lg-5">
-            <div class="card str-card h-100">
+
+        <div class="col-12 col-xl-8">
+            <div class="card str-card mb-3">
                 <div class="card-body">
+                    <h2 class="h5 mb-0">Task Details</h2>
                     @if (SelectedTask is null)
                     {
-                        <p class="text-muted mb-0">Select a task to begin.</p>
+                        <p class="text-muted mt-3 mb-0">Select a task to begin.</p>
                     }
                     else
                     {
-                        <h2 class="h5 mb-3">@SelectedTask.Title</h2>
+                        <div class="task-details-shell">
+                            <div>
+                                <h3 class="h6 mb-1">@SelectedTask.Title</h3>
+                                <p class="text-muted mb-0">@GetTaskHelperText(SelectedTask)</p>
+                            </div>
 
-                        <div class="mb-3">
-                            <p class="fw-semibold mb-2">Result</p>
-                            <div class="result-segmented" role="group" aria-label="Task result">
-                                <button type="button" class="btn result-btn @(SelectedTask.Result == str_test_demo_blazor.Domain.TestTaskResult.Pass ? "btn-success" : "btn-outline-success")" @onclick="() => SetResult(str_test_demo_blazor.Domain.TestTaskResult.Pass)">Pass</button>
-                                <button type="button" class="btn result-btn @(SelectedTask.Result == str_test_demo_blazor.Domain.TestTaskResult.Fail ? "btn-danger" : "btn-outline-danger")" @onclick="() => SetResult(str_test_demo_blazor.Domain.TestTaskResult.Fail)">Fail</button>
-                                <button type="button" class="btn result-btn @(SelectedTask.Result == str_test_demo_blazor.Domain.TestTaskResult.NA ? "btn-secondary" : "btn-outline-secondary")" @onclick="() => SetResult(str_test_demo_blazor.Domain.TestTaskResult.NA)">N/A</button>
+                            <div>
+                                <p class="form-section-title">Result</p>
+                                <div class="result-segmented" role="group" aria-label="Task result">
+                                    <button type="button" class="btn result-btn @(SelectedTask.Result == str_test_demo_blazor.Domain.TestTaskResult.Pass ? "btn-success" : "btn-outline-success")" @onclick="() => SetResult(str_test_demo_blazor.Domain.TestTaskResult.Pass)">Pass</button>
+                                    <button type="button" class="btn result-btn @(SelectedTask.Result == str_test_demo_blazor.Domain.TestTaskResult.Fail ? "btn-danger" : "btn-outline-danger")" @onclick="() => SetResult(str_test_demo_blazor.Domain.TestTaskResult.Fail)">Fail</button>
+                                    <button type="button" class="btn result-btn @(SelectedTask.Result == str_test_demo_blazor.Domain.TestTaskResult.NA ? "btn-secondary" : "btn-outline-secondary")" @onclick="() => SetResult(str_test_demo_blazor.Domain.TestTaskResult.NA)">N/A</button>
+                                </div>
+                            </div>
+
+                            <div>
+                                <div class="d-flex align-items-center justify-content-between flex-wrap gap-2 mb-2">
+                                    <p class="form-section-title mb-0">Evidence</p>
+                                    <button type="button" class="btn btn-outline-primary" @onclick="AddPhoto">Add Photo</button>
+                                </div>
+                                @if (SelectedTask.PhotoSvgPaths.Count > 0)
+                                {
+                                    <div class="photo-grid">
+                                        @foreach (var photoPath in SelectedTask.PhotoSvgPaths)
+                                        {
+                                            <button type="button" class="photo-thumb" @onclick="() => OpenPhotoPreview(photoPath)">
+                                                <img src="@photoPath" alt="Evidence photo thumbnail" loading="lazy" />
+                                            </button>
+                                        }
+                                    </div>
+                                }
+                                else
+                                {
+                                    <p class="text-muted small mb-0">Attach photo evidence where required.</p>
+                                }
+                            </div>
+
+                            <div>
+                                <label class="form-label" for="task-comment">Notes</label>
+                                <textarea id="task-comment" class="form-control comments-input" rows="4" value="@SelectedTask.Comment" @oninput="UpdateComment"></textarea>
+                                <small class="text-muted">Capture details that support this outcome.</small>
+                            </div>
+
+                            <div class="minutes-row">
+                                <div>
+                                    <label class="form-label mb-1" for="minutes-spent">Minutes</label>
+                                    <input id="minutes-spent" type="number" class="form-control minutes-input" min="0" @bind="SelectedTask.MinutesSpent" @bind:after="HandleMinutesChanged" />
+                                </div>
+                                <div class="minutes-summary">
+                                    <strong>Total Minutes</strong>
+                                    <span>@CurrentRun.TotalMinutes</span>
+                                </div>
+                                @if (CurrentRun.CompletedAt is not null)
+                                {
+                                    <div class="minutes-summary">
+                                        <strong>Completed</strong>
+                                        <span>@CurrentRun.CompletedAt.Value.ToString("g")</span>
+                                    </div>
+                                }
                             </div>
                         </div>
-
-                        <div class="mb-3">
-                            <label class="form-label" for="task-comment">Comment</label>
-                            <textarea id="task-comment" class="form-control" rows="4" value="@SelectedTask.Comment" @oninput="UpdateComment"></textarea>
-                            <small class="text-muted">Comment autosaves to demo in-memory service.</small>
-                        </div>
-
-                        <div class="mb-3">
-                            <button type="button" class="btn btn-outline-primary" @onclick="AddPhoto">Add Photo (SVG)</button>
-                            @if (SelectedTask.PhotoSvgPaths.Count > 0)
-                            {
-                                <div class="photo-grid mt-3">
-                                    @foreach (var photoPath in SelectedTask.PhotoSvgPaths)
-                                    {
-                                        <a class="photo-thumb" href="@photoPath" target="_blank" title="Open @photoPath">
-                                            <img src="@photoPath" alt="Evidence photo thumbnail" loading="lazy" />
-                                        </a>
-                                    }
-                                </div>
-                            }
-                        </div>
-
-                        <div class="mb-3">
-                            <label class="form-label" for="minutes-spent">Minutes spent</label>
-                            <input id="minutes-spent" type="number" class="form-control" min="0" @bind="SelectedTask.MinutesSpent" @bind:after="HandleMinutesChanged" />
-                        </div>
                     }
-
-                    <hr />
-                    <div class="d-flex justify-content-between align-items-center flex-wrap gap-2">
-                        <div>
-                            <strong>Total Minutes:</strong> @CurrentRun.TotalMinutes
-                            @if (CurrentRun.CompletedAt is not null)
-                            {
-                                <span class="ms-3"><strong>Completed:</strong> @CurrentRun.CompletedAt.Value.ToString("g")</span>
-                            }
-                        </div>
-                    </div>
                 </div>
             </div>
-        </div>
 
-        <div class="col-12 col-lg-4">
-            <div class="card str-card h-100">
+            <div class="card str-card">
                 <div class="card-body">
                     <h2 class="h5">Activity Log</h2>
-                    @if (_activityLog.Count == 0)
-                    {
-                        <p class="text-muted mb-0">No activity yet.</p>
-                    }
-                    else
-                    {
-                        <ul class="list-unstyled mb-0 activity-log-list">
-                            @foreach (var entry in _activityLog.OrderByDescending(item => item.Timestamp))
-                            {
-                                <li class="activity-entry" @key="entry.Id">
-                                    <div class="small text-muted">@entry.Timestamp.ToString("HH:mm:ss")</div>
-                                    <div>@entry.Message</div>
-                                </li>
-                            }
-                        </ul>
-                    }
+                    <ul class="list-unstyled mb-0 activity-log-list">
+                        @foreach (var entry in GetActivityLog())
+                        {
+                            <li class="activity-entry" @key="entry.Id">
+                                <div class="small text-muted">@entry.Timestamp.ToString("HH:mm:ss")</div>
+                                <div>@entry.Message</div>
+                            </li>
+                        }
+                    </ul>
                 </div>
             </div>
         </div>
     </section>
+
+    @if (!string.IsNullOrWhiteSpace(_previewPhotoPath))
+    {
+        <div class="photo-modal-backdrop" @onclick="ClosePhotoPreview">
+            <div class="photo-modal-dialog" @onclick:stopPropagation="true">
+                <div class="photo-modal-header">
+                    <h3 class="h6 mb-0">Evidence Preview</h3>
+                    <button type="button" class="btn btn-sm btn-outline-secondary" @onclick="ClosePhotoPreview">Close</button>
+                </div>
+                <img src="@_previewPhotoPath" alt="Evidence photo preview" class="photo-modal-image" />
+            </div>
+        </div>
+    }
 }
 
 @code {
@@ -236,6 +269,8 @@ else
     [SupplyParameterFromQuery(Name = "templateId")]
     public Guid? TemplateId { get; set; }
 
+    private static readonly Dictionary<Guid, List<ActivityLogEntry>> _activityLogStore = [];
+
     private readonly TimeSpan _tick = TimeSpan.FromSeconds(1);
     private readonly List<DateTime> _pauseEvents = [];
     private readonly string[] _photoPlaceholders =
@@ -244,11 +279,12 @@ else
         "/demo-images/photo-placeholder-2.svg",
         "/demo-images/photo-placeholder-3.svg"
     ];
-    private readonly List<ActivityLogEntry> _activityLog = [];
 
     private Guid SelectedAssetId { get; set; }
     private Guid SelectedTemplateId { get; set; }
     private Guid? SelectedTaskId { get; set; }
+    private TaskFilter SelectedFilter { get; set; } = TaskFilter.All;
+    private string? _previewPhotoPath;
 
     private System.Threading.Timer? _timer;
     private TimeSpan _elapsedBeforeCurrentRun = TimeSpan.Zero;
@@ -276,9 +312,14 @@ else
 
     protected override void OnParametersSet()
     {
-        if (CurrentRun is not null && (SelectedTaskId is null || CurrentRun.TestTaskRuns.All(task => task.Id != SelectedTaskId)))
+        if (CurrentRun is not null)
         {
-            SelectedTaskId = CurrentRun.TestTaskRuns.FirstOrDefault()?.Id;
+            if (SelectedTaskId is null || CurrentRun.TestTaskRuns.All(task => task.Id != SelectedTaskId))
+            {
+                SelectedTaskId = CurrentRun.TestTaskRuns.FirstOrDefault()?.Id;
+            }
+
+            EnsureSeededActivityLog(CurrentRun);
         }
 
         if (CurrentRun is null)
@@ -309,6 +350,20 @@ else
 
     private void SelectTask(Guid taskId) => SelectedTaskId = taskId;
 
+    private void SetFilter(TaskFilter filter) => SelectedFilter = filter;
+
+    private IEnumerable<str_test_demo_blazor.Domain.TestTaskRun> GetFilteredTasks(
+        str_test_demo_blazor.Domain.TestRun run,
+        str_test_demo_blazor.Domain.TestTemplate? template)
+    {
+        return SelectedFilter switch
+        {
+            TaskFilter.Required => run.TestTaskRuns.Where(task => IsTaskRequired(task, template)),
+            TaskFilter.Failed => run.TestTaskRuns.Where(task => task.Result == str_test_demo_blazor.Domain.TestTaskResult.Fail),
+            _ => run.TestTaskRuns
+        };
+    }
+
     private void SetResult(str_test_demo_blazor.Domain.TestTaskResult result)
     {
         if (SelectedTask is null)
@@ -317,7 +372,7 @@ else
         }
 
         SelectedTask.Result = result;
-        AddActivityLog($"Result set to {result} for '{SelectedTask.Title}'");
+        AddActivityLog($"{SelectedTask.Title} marked {result}");
     }
 
     private void UpdateComment(ChangeEventArgs args)
@@ -328,32 +383,37 @@ else
         }
 
         SelectedTask.Comment = args.Value?.ToString();
-        AddActivityLog($"Comment updated for '{SelectedTask.Title}'");
+        AddActivityLog("Comment updated");
     }
-
 
     private static bool IsTaskRequired(str_test_demo_blazor.Domain.TestTaskRun task, str_test_demo_blazor.Domain.TestTemplate? template)
     {
         return template?.TestTasks.FirstOrDefault(templateTask => templateTask.Id == task.TaskTemplateId)?.RequiresPhoto ?? false;
     }
-    private static string GetRunStatusLabel(str_test_demo_blazor.Domain.TestRun run)
+
+    private static string GetRunStatusLabel(str_test_demo_blazor.Domain.TestRun run, DateTime dueDate)
     {
-        if (run.Status == str_test_demo_blazor.Domain.TestRunStatus.NotStarted)
+        if (run.Status == str_test_demo_blazor.Domain.TestRunStatus.Completed)
         {
-            return "Open";
+            return "Completed";
         }
 
-        return run.Status == str_test_demo_blazor.Domain.TestRunStatus.InProgress
-            ? "In Progress"
-            : "Completed";
+        if (run.Status == str_test_demo_blazor.Domain.TestRunStatus.InProgress)
+        {
+            return "In Progress";
+        }
+
+        return dueDate.Date < DateTime.Today ? "Overdue" : "Open";
     }
 
-    private static string GetRunStatusPillClass(str_test_demo_blazor.Domain.TestRun run) => run.Status switch
-    {
-        str_test_demo_blazor.Domain.TestRunStatus.InProgress => "status-pill-in-progress",
-        str_test_demo_blazor.Domain.TestRunStatus.Completed => "status-pill-completed",
-        _ => "status-pill-open"
-    };
+    private static string GetRunStatusPillClass(str_test_demo_blazor.Domain.TestRun run, DateTime dueDate) =>
+        GetRunStatusLabel(run, dueDate) switch
+        {
+            "Overdue" => "status-pill-overdue",
+            "In Progress" => "status-pill-in-progress",
+            "Completed" => "status-pill-completed",
+            _ => "status-pill-open"
+        };
 
     private void AddPhoto()
     {
@@ -364,8 +424,12 @@ else
 
         var path = _photoPlaceholders[SelectedTask.PhotoSvgPaths.Count % _photoPlaceholders.Length];
         SelectedTask.PhotoSvgPaths.Add(path);
-        AddActivityLog($"Photo added to '{SelectedTask.Title}'");
+        AddActivityLog("Photo evidence added");
     }
+
+    private void OpenPhotoPreview(string photoPath) => _previewPhotoPath = photoPath;
+
+    private void ClosePhotoPreview() => _previewPhotoPath = null;
 
     private void HandleMinutesChanged()
     {
@@ -377,6 +441,33 @@ else
         AddActivityLog($"Minutes changed for '{SelectedTask.Title}' to {SelectedTask.MinutesSpent}");
     }
 
+    private void ToggleTimer()
+    {
+        if (!_timerStarted)
+        {
+            StartTimer();
+            return;
+        }
+
+        if (_timerRunning)
+        {
+            PauseTimer();
+            return;
+        }
+
+        ResumeTimer();
+    }
+
+    private string GetTimerButtonLabel()
+    {
+        if (!_timerStarted)
+        {
+            return "Start";
+        }
+
+        return _timerRunning ? "Pause" : "Resume";
+    }
+
     private void StartTimer()
     {
         _timerStarted = true;
@@ -386,6 +477,7 @@ else
         if (CurrentRun is not null)
         {
             CurrentRun.Status = str_test_demo_blazor.Domain.TestRunStatus.InProgress;
+            AddActivityLog("Timer started");
         }
     }
 
@@ -400,6 +492,7 @@ else
         _timerStartedAtUtc = null;
         _timerRunning = false;
         _pauseEvents.Add(DateTime.Now);
+        AddActivityLog("Timer paused");
     }
 
     private void ResumeTimer()
@@ -408,6 +501,7 @@ else
         _timerStarted = true;
         _timerStartedAtUtc = DateTime.UtcNow;
         _pauseEvents.Add(DateTime.Now);
+        AddActivityLog("Timer resumed");
     }
 
     private void CompleteTest()
@@ -427,13 +521,76 @@ else
         AddActivityLog("Test completed");
     }
 
+    private void EnsureSeededActivityLog(str_test_demo_blazor.Domain.TestRun run)
+    {
+        if (_activityLogStore.ContainsKey(run.Id))
+        {
+            return;
+        }
+
+        var now = DateTime.Now;
+        _activityLogStore[run.Id] =
+        [
+            new ActivityLogEntry(Guid.NewGuid(), now.AddMinutes(-9), "Test opened"),
+            new ActivityLogEntry(Guid.NewGuid(), now.AddMinutes(-7), "Timer started"),
+            new ActivityLogEntry(Guid.NewGuid(), now.AddMinutes(-5), "Calibration Task 2 marked Pass"),
+            new ActivityLogEntry(Guid.NewGuid(), now.AddMinutes(-3), "Photo evidence added"),
+            new ActivityLogEntry(Guid.NewGuid(), now.AddMinutes(-1), "Comment updated")
+        ];
+    }
+
+    private IEnumerable<ActivityLogEntry> GetActivityLog()
+    {
+        if (CurrentRun is null)
+        {
+            return [];
+        }
+
+        EnsureSeededActivityLog(CurrentRun);
+        return _activityLogStore[CurrentRun.Id].OrderByDescending(entry => entry.Timestamp);
+    }
+
     private void AddActivityLog(string message)
     {
-        _activityLog.Insert(0, new ActivityLogEntry(Guid.NewGuid(), DateTime.Now, message));
+        if (CurrentRun is null)
+        {
+            return;
+        }
+
+        EnsureSeededActivityLog(CurrentRun);
+        _activityLogStore[CurrentRun.Id].Insert(0, new ActivityLogEntry(Guid.NewGuid(), DateTime.Now, message));
     }
 
     private static string FormatElapsed(TimeSpan elapsed) =>
-        $"{(int)elapsed.TotalMinutes:00}:{elapsed.Seconds:00}";
+        $"{(int)elapsed.TotalHours:00}:{elapsed.Minutes:00}:{elapsed.Seconds:00}";
+
+    private static string GetFilterLabel(TaskFilter filter) => filter switch
+    {
+        TaskFilter.Required => "Required",
+        TaskFilter.Failed => "Failed",
+        _ => "All"
+    };
+
+    private static string GetTaskResultLabel(str_test_demo_blazor.Domain.TestTaskResult result) => result switch
+    {
+        str_test_demo_blazor.Domain.TestTaskResult.Pass => "Pass",
+        str_test_demo_blazor.Domain.TestTaskResult.Fail => "Fail",
+        str_test_demo_blazor.Domain.TestTaskResult.NA => "N/A",
+        _ => "Not Run"
+    };
+
+    private static string GetTaskStatusClass(str_test_demo_blazor.Domain.TestTaskRun task) => task.Result switch
+    {
+        str_test_demo_blazor.Domain.TestTaskResult.Pass => "task-result-pass",
+        str_test_demo_blazor.Domain.TestTaskResult.Fail => "task-result-fail",
+        str_test_demo_blazor.Domain.TestTaskResult.NA => "task-result-na",
+        _ => "task-result-not-run"
+    };
+
+    private static string GetTaskHelperText(str_test_demo_blazor.Domain.TestTaskRun task) =>
+        string.IsNullOrWhiteSpace(task.Comment)
+            ? "Follow the procedure and record outcome."
+            : "Existing note available below; update as needed.";
 
     private static DateTime GetDueDate(str_test_demo_blazor.Domain.TestRun run, str_test_demo_blazor.Domain.TestTemplate? template)
     {
@@ -499,4 +656,11 @@ else
     }
 
     private sealed record ActivityLogEntry(Guid Id, DateTime Timestamp, string Message);
+
+    private enum TaskFilter
+    {
+        All,
+        Required,
+        Failed
+    }
 }
