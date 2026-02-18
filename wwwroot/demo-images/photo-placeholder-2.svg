@@ -1,6 +1,11 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="240" height="160" viewBox="0 0 240 160">
-  <rect width="240" height="160" fill="#f8f9fa" />
-  <polygon points="30,130 90,60 130,105 170,70 210,130" fill="#adb5bd" />
-  <circle cx="75" cy="48" r="16" fill="#ced4da" />
-  <text x="120" y="150" text-anchor="middle" font-family="Arial, sans-serif" font-size="14" fill="#495057">Photo Placeholder 2</text>
+<svg xmlns="http://www.w3.org/2000/svg" width="480" height="320" viewBox="0 0 480 320" role="img" aria-labelledby="title2 desc2">
+  <title id="title2">Demo Photo 2 Placeholder</title>
+  <desc id="desc2">Placeholder card for demo photo evidence two.</desc>
+  <rect width="480" height="320" rx="18" fill="#eef4ff"/>
+  <rect x="24" y="24" width="432" height="272" rx="14" fill="#ffffff" stroke="#b6c6f5" stroke-width="3"/>
+  <rect x="150" y="116" width="180" height="96" rx="12" fill="#dbe4ff" stroke="#4c6ef5" stroke-width="4"/>
+  <rect x="172" y="98" width="56" height="20" rx="6" fill="#91a7ff"/>
+  <circle cx="240" cy="164" r="30" fill="#bac8ff" stroke="#364fc7" stroke-width="4"/>
+  <circle cx="240" cy="164" r="11" fill="#364fc7"/>
+  <text x="240" y="258" text-anchor="middle" font-size="26" fill="#364fc7" font-family="Arial, Helvetica, sans-serif">Demo Photo 2</text>
 </svg>

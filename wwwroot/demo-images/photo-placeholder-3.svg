@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="480" height="320" viewBox="0 0 480 320" role="img" aria-labelledby="title3 desc3">
+  <title id="title3">Demo Photo 3 Placeholder</title>
+  <desc id="desc3">Placeholder card for demo photo evidence three.</desc>
+  <rect width="480" height="320" rx="18" fill="#ecfdf3"/>
+  <rect x="24" y="24" width="432" height="272" rx="14" fill="#ffffff" stroke="#b2f2bb" stroke-width="3"/>
+  <rect x="150" y="116" width="180" height="96" rx="12" fill="#d3f9d8" stroke="#2f9e44" stroke-width="4"/>
+  <rect x="172" y="98" width="56" height="20" rx="6" fill="#8ce99a"/>
+  <circle cx="240" cy="164" r="30" fill="#b2f2bb" stroke="#2b8a3e" stroke-width="4"/>
+  <circle cx="240" cy="164" r="11" fill="#2b8a3e"/>
+  <text x="240" y="258" text-anchor="middle" font-size="26" fill="#2b8a3e" font-family="Arial, Helvetica, sans-serif">Demo Photo 3</text>
+</svg>
