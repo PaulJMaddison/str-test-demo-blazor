@@ -1,0 +1,24 @@
+.chart-card {
+    width: 100%;
+}
+
+.chart-svg {
+    width: 100%;
+    height: auto;
+    display: block;
+}
+
+.chart-axis {
+    stroke: var(--str-border-color, #cbd5e1);
+    stroke-width: 1;
+}
+
+.chart-bar {
+    fill: var(--str-primary, #3b82f6);
+}
+
+.chart-label {
+    fill: var(--str-text-muted, #64748b);
+    font-size: 11px;
+    font-family: var(--bs-body-font-family, system-ui);
+}
