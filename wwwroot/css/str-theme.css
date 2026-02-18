@@ -1,0 +1,227 @@
+:root {
+    --str-font-sans: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    --str-bg: #edf2f9;
+    --str-surface: #ffffff;
+    --str-surface-soft: #f8fbff;
+    --str-border: #d8e1ef;
+    --str-text: #1b2738;
+    --str-muted: #5c6b82;
+    --str-primary: #1f5fbf;
+    --str-primary-strong: #174997;
+    --str-secondary: #e9eff8;
+    --str-danger: #cc3346;
+    --str-success: #188a4b;
+    --str-radius: 14px;
+    --str-shadow: 0 8px 24px rgba(16, 38, 76, 0.08);
+    --str-space-1: 0.5rem;
+    --str-space-2: 0.75rem;
+    --str-space-3: 1rem;
+    --str-space-4: 1.25rem;
+    --str-space-5: 1.5rem;
+}
+
+html,
+body {
+    font-family: var(--str-font-sans);
+    font-size: 17px;
+    color: var(--str-text);
+    background: radial-gradient(circle at top right, #f8fbff 0%, var(--str-bg) 45%, #eaf0f8 100%);
+}
+
+body {
+    line-height: 1.45;
+}
+
+h1,
+h2,
+h3,
+h4 {
+    color: #142033;
+    letter-spacing: 0.01em;
+}
+
+p,
+.text-muted {
+    color: var(--str-muted) !important;
+}
+
+a,
+.btn-link {
+    color: var(--str-primary);
+}
+
+a:hover {
+    color: var(--str-primary-strong);
+}
+
+.content-shell {
+    padding: var(--str-space-5);
+}
+
+.str-card,
+.card {
+    border-radius: var(--str-radius);
+    border: 1px solid var(--str-border);
+    box-shadow: var(--str-shadow);
+    background-color: var(--str-surface);
+}
+
+.card-body {
+    padding: var(--str-space-5);
+}
+
+.str-button,
+.btn {
+    min-height: 48px;
+    border-radius: 12px;
+    font-weight: 600;
+    transition: background-color 150ms ease, border-color 150ms ease, box-shadow 150ms ease, transform 120ms ease;
+}
+
+.btn:active,
+.str-button:active {
+    transform: translateY(1px);
+}
+
+.btn-primary,
+.str-button--primary {
+    background-color: var(--str-primary);
+    border-color: var(--str-primary);
+}
+
+.btn-primary:hover,
+.str-button--primary:hover {
+    background-color: var(--str-primary-strong);
+    border-color: var(--str-primary-strong);
+}
+
+.btn-outline-secondary,
+.str-button--secondary {
+    border-color: #b8c5dc;
+    color: #30405a;
+    background-color: #fff;
+}
+
+.btn-outline-secondary:hover,
+.str-button--secondary:hover {
+    background-color: var(--str-secondary);
+    border-color: #a9b9d5;
+    color: #27364d;
+}
+
+.btn-danger,
+.str-button--danger {
+    background-color: var(--str-danger);
+    border-color: var(--str-danger);
+}
+
+.btn-success {
+    background-color: var(--str-success);
+    border-color: var(--str-success);
+}
+
+.form-label {
+    font-weight: 600;
+    margin-bottom: 0.45rem;
+}
+
+.form-control,
+.form-select,
+textarea.form-control {
+    min-height: 48px;
+    border-radius: 12px;
+    border: 1px solid #c5d2e7;
+    padding: 0.7rem 0.9rem;
+}
+
+.form-control:focus,
+.form-select:focus,
+textarea.form-control:focus {
+    border-color: #5f93e5;
+    box-shadow: 0 0 0 0.2rem rgba(31, 95, 191, 0.2);
+}
+
+.status-pill,
+.str-pill {
+    display: inline-flex;
+    align-items: center;
+    border-radius: 999px;
+    padding: 0.3rem 0.8rem;
+    border: 1px solid transparent;
+    font-weight: 700;
+    font-size: 0.78rem;
+    letter-spacing: 0.03em;
+    text-transform: uppercase;
+}
+
+.status-pill-open,
+.str-pill--open {
+    background: #f1f5fb;
+    border-color: #cad5e8;
+    color: #334155;
+}
+
+.status-pill-in-progress,
+.status-pill--progress,
+.str-pill--in-progress {
+    background: #dceafe;
+    border-color: #9dc0f9;
+    color: #15499f;
+}
+
+.status-pill-completed,
+.status-pill--completed,
+.str-pill--completed {
+    background: #ddf7e7;
+    border-color: #95e2b4;
+    color: #166534;
+}
+
+.status-pill-overdue,
+.str-pill--overdue {
+    background: #fde3e7;
+    border-color: #f5a3af;
+    color: #9c2435;
+}
+
+.table {
+    --bs-table-bg: transparent;
+    margin-bottom: 0;
+}
+
+.table thead th {
+    background-color: #f4f7fc;
+    color: #3a4b65;
+    font-size: 0.82rem;
+    letter-spacing: 0.03em;
+    text-transform: uppercase;
+    border-bottom-width: 1px;
+    position: sticky;
+    top: 0;
+    z-index: 1;
+}
+
+.table > :not(caption) > * > * {
+    padding: 0.9rem 0.8rem;
+    vertical-align: middle;
+}
+
+.table-striped > tbody > tr:nth-of-type(odd) > * {
+    --bs-table-accent-bg: #f9fbff;
+}
+
+.list-group-item {
+    min-height: 48px;
+}
+
+@media (max-width: 640.98px) {
+    html,
+    body {
+        font-size: 16px;
+    }
+
+    .content-shell,
+    .card-body {
+        padding: var(--str-space-4);
+    }
+}
