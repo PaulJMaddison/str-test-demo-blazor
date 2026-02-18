@@ -51,6 +51,7 @@
                     @foreach (var test in RecentTests)
                     {
                         var asset = DemoData.FindAsset(test.AssetId);
+                        var statusLabel = GetStatusLabel(test);
 
                         <tr>
                             <td>
@@ -64,7 +65,9 @@
                                 }
                             </td>
                             <td>@asset?.AssetTag</td>
-                            <td>@test.Status</td>
+                            <td>
+                                <span class="status-pill @GetStatusPillClass(statusLabel)">@statusLabel</span>
+                            </td>
                             <td>@test.TechnicianName</td>
                             <td>@(test.CompletedAt?.ToString("yyyy-MM-dd HH:mm") ?? "In progress")</td>
                         </tr>
@@ -78,10 +81,36 @@
 @code {
     private int TestsToday => DemoData.TestRuns.Count(run => run.StartedAt.Date == DateTime.Today);
     private int OpenTests => DemoData.TestRuns.Count(run => run.Status != str_test_demo_blazor.Domain.TestRunStatus.Completed);
-    private int Overdue => DemoData.TestRuns.Count(run =>
-        run.Status != str_test_demo_blazor.Domain.TestRunStatus.Completed
-        && run.StartedAt < DateTime.Now.AddHours(-4));
+    private int Overdue => DemoData.TestRuns.Count(IsOverdue);
 
     private IEnumerable<str_test_demo_blazor.Domain.TestRun> RecentTests =>
         DemoData.TestRuns.OrderByDescending(run => run.StartedAt).Take(10);
+
+    private static bool IsOverdue(str_test_demo_blazor.Domain.TestRun run) =>
+        run.Status != str_test_demo_blazor.Domain.TestRunStatus.Completed
+        && run.StartedAt < DateTime.Now.AddHours(-4);
+
+    private static string GetStatusLabel(str_test_demo_blazor.Domain.TestRun run)
+    {
+        if (IsOverdue(run))
+        {
+            return "Overdue";
+        }
+
+        return run.Status switch
+        {
+            str_test_demo_blazor.Domain.TestRunStatus.NotStarted => "Open",
+            str_test_demo_blazor.Domain.TestRunStatus.InProgress => "In Progress",
+            str_test_demo_blazor.Domain.TestRunStatus.Completed => "Completed",
+            _ => "Open"
+        };
+    }
+
+    private static string GetStatusPillClass(string statusLabel) => statusLabel switch
+    {
+        "In Progress" => "status-pill-in-progress",
+        "Completed" => "status-pill-completed",
+        "Overdue" => "status-pill-overdue",
+        _ => "status-pill-open"
+    };
 }
