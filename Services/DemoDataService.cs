@@ -47,6 +47,7 @@ public class DemoDataService
 
     public Asset? FindAsset(Guid id) => _assets.FirstOrDefault(asset => asset.Id == id);
     public TestTemplate? FindTemplate(Guid id) => _templates.FirstOrDefault(template => template.Id == id);
+    public TestRun? FindTestRun(Guid id) => _testRuns.FirstOrDefault(run => run.Id == id);
 
     private static List<Asset> SeedAssets() =>
     [
@@ -115,10 +116,32 @@ public class DemoDataService
         run.Status = TestRunStatus.Completed;
         run.CompletedAt = DateTime.Now.AddHours(-hoursAgo);
 
-        foreach (var task in run.TestTaskRuns)
+        for (var index = 0; index < run.TestTaskRuns.Count; index++)
         {
-            task.Result = TestTaskResult.Pass;
-            task.MinutesSpent = 5;
+            var task = run.TestTaskRuns[index];
+            task.Result = index % 6 == 0
+                ? TestTaskResult.Fail
+                : index % 4 == 0
+                    ? TestTaskResult.NA
+                    : TestTaskResult.Pass;
+            task.MinutesSpent = 4 + index;
+
+            if (task.Result != TestTaskResult.Pass)
+            {
+                task.Comment = task.Result == TestTaskResult.Fail
+                    ? "Follow-up maintenance required."
+                    : "Not applicable for this asset configuration.";
+            }
+
+            if (index % 3 == 1)
+            {
+                task.PhotoSvgPaths.Add("demo-images/photo-placeholder-1.svg");
+                task.PhotoSvgPaths.Add("demo-images/photo-placeholder-2.svg");
+            }
+            else if (index % 3 == 2)
+            {
+                task.PhotoSvgPaths.Add("demo-images/camera-icon-placeholder.svg");
+            }
         }
     }
 }

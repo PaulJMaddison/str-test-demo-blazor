@@ -150,12 +150,18 @@ else
                                 <span class="ms-3"><strong>Completed:</strong> @CurrentRun.CompletedAt.Value.ToString("g")</span>
                             }
                         </div>
-                        <button type="button"
-                                class="btn btn-success"
-                                disabled="@(CurrentRun.Status == str_test_demo_blazor.Domain.TestRunStatus.Completed)"
-                                @onclick="CompleteTest">
-                            Complete Test
-                        </button>
+                        <div class="d-flex gap-2 flex-wrap">
+                            <button type="button"
+                                    class="btn btn-success"
+                                    disabled="@(CurrentRun.Status == str_test_demo_blazor.Domain.TestRunStatus.Completed)"
+                                    @onclick="CompleteTest">
+                                Complete Test
+                            </button>
+                            @if (CurrentRun.Status == str_test_demo_blazor.Domain.TestRunStatus.Completed)
+                            {
+                                <a class="btn btn-outline-primary" href="@($"/certificate/{CurrentRun.Id}")">View Certificate</a>
+                            }
+                        </div>
                     </div>
                 </div>
             </div>

@@ -1,0 +1,42 @@
+.certificate {
+    max-width: 960px;
+    margin: 0 auto;
+    border: 1px solid #d9dee5;
+}
+
+.certificate-header {
+    text-align: center;
+}
+
+.summary-card {
+    background: #f8fafc;
+}
+
+.certificate-photo {
+    width: 160px;
+    height: 120px;
+    object-fit: cover;
+    background-color: #fff;
+}
+
+@media print {
+    .no-print,
+    .navbar,
+    .top-row,
+    .sidebar {
+        display: none !important;
+    }
+
+    .main,
+    .content,
+    .certificate {
+        margin: 0;
+        max-width: none;
+        box-shadow: none !important;
+        border: 0;
+    }
+
+    .certificate-table {
+        font-size: 0.95rem;
+    }
+}
