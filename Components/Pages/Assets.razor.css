@@ -23,6 +23,33 @@
     width: 100%;
     max-height: 180px;
     object-fit: contain;
-    border-radius: 0.5rem;
+    border-radius: 0.75rem;
     background: #f8f9fa;
+    border: 1px solid #dce5f3;
+}
+
+.search-field {
+    position: relative;
+}
+
+.search-field .form-control {
+    padding-right: 2.5rem;
+}
+
+.search-clear {
+    position: absolute;
+    right: 0.45rem;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 1.9rem;
+    height: 1.9rem;
+    border-radius: 999px;
+    border: 0;
+    background: #eaf0fb;
+    color: #29466f;
+    font-weight: 700;
+}
+
+.search-clear:hover {
+    background: #d9e6f8;
 }

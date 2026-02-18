@@ -63,7 +63,7 @@ else
                         <p class="text-muted mb-0">@(asset is null ? "Asset details unavailable" : $"{asset.Type} • {asset.Location}")</p>
                     </div>
                 </div>
-                <div class="run-test-header__right border rounded p-3 bg-light">
+                <div class="run-test-header__right">
                     <p class="text-uppercase text-muted small mb-1">Timer</p>
                     <p class="display-6 mb-2">@FormatElapsed(Elapsed)</p>
                     <div class="d-flex gap-2 flex-wrap justify-content-end">
@@ -81,7 +81,7 @@ else
                         }
 
                         <button type="button"
-                                class="btn btn-sm btn-success"
+                                class="btn btn-sm btn-success complete-test-btn"
                                 disabled="@(CurrentRun.Status == str_test_demo_blazor.Domain.TestRunStatus.Completed)"
                                 @onclick="CompleteTest">
                             Complete Test
@@ -116,15 +116,23 @@ else
             <div class="card str-card h-100">
                 <div class="card-body">
                     <h2 class="h5">Tasks</h2>
-                    <div class="list-group">
+                    <div class="list-group task-list">
                         @foreach (var task in CurrentRun.TestTaskRuns)
                         {
                             var isSelected = task.Id == SelectedTaskId;
                             <button type="button"
                                     class="list-group-item list-group-item-action d-flex justify-content-between align-items-center @(isSelected ? "active" : string.Empty)"
                                     @onclick="() => SelectTask(task.Id)">
-                                <span>@task.Title</span>
-                                <span class="badge rounded-pill text-bg-light text-dark">@task.Result</span>
+                                <span class="task-title-wrap">
+                                        <span>@task.Title</span>
+                                        @if (IsTaskRequired(task, template))
+                                        {
+                                            <span class="urgency-badge">Required</span>
+                                        }
+                                    </span>
+                                    <span class="task-result-chip">
+                                        <span class="task-complete-dot @(task.Result == str_test_demo_blazor.Domain.TestTaskResult.NotRun ? string.Empty : "task-complete-dot--done")"></span>@task.Result
+                                    </span>
                             </button>
                         }
                     </div>
@@ -144,10 +152,10 @@ else
 
                         <div class="mb-3">
                             <p class="fw-semibold mb-2">Result</p>
-                            <div class="btn-group" role="group" aria-label="Task result">
-                                <button type="button" class="btn @(SelectedTask.Result == str_test_demo_blazor.Domain.TestTaskResult.Pass ? "btn-success" : "btn-outline-success")" @onclick="() => SetResult(str_test_demo_blazor.Domain.TestTaskResult.Pass)">Pass</button>
-                                <button type="button" class="btn @(SelectedTask.Result == str_test_demo_blazor.Domain.TestTaskResult.Fail ? "btn-danger" : "btn-outline-danger")" @onclick="() => SetResult(str_test_demo_blazor.Domain.TestTaskResult.Fail)">Fail</button>
-                                <button type="button" class="btn @(SelectedTask.Result == str_test_demo_blazor.Domain.TestTaskResult.NA ? "btn-secondary" : "btn-outline-secondary")" @onclick="() => SetResult(str_test_demo_blazor.Domain.TestTaskResult.NA)">N/A</button>
+                            <div class="result-segmented" role="group" aria-label="Task result">
+                                <button type="button" class="btn result-btn @(SelectedTask.Result == str_test_demo_blazor.Domain.TestTaskResult.Pass ? "btn-success" : "btn-outline-success")" @onclick="() => SetResult(str_test_demo_blazor.Domain.TestTaskResult.Pass)">Pass</button>
+                                <button type="button" class="btn result-btn @(SelectedTask.Result == str_test_demo_blazor.Domain.TestTaskResult.Fail ? "btn-danger" : "btn-outline-danger")" @onclick="() => SetResult(str_test_demo_blazor.Domain.TestTaskResult.Fail)">Fail</button>
+                                <button type="button" class="btn result-btn @(SelectedTask.Result == str_test_demo_blazor.Domain.TestTaskResult.NA ? "btn-secondary" : "btn-outline-secondary")" @onclick="() => SetResult(str_test_demo_blazor.Domain.TestTaskResult.NA)">N/A</button>
                             </div>
                         </div>
 
@@ -203,7 +211,7 @@ else
                     else
                     {
                         <ul class="list-unstyled mb-0 activity-log-list">
-                            @foreach (var entry in _activityLog)
+                            @foreach (var entry in _activityLog.OrderByDescending(item => item.Timestamp))
                             {
                                 <li class="activity-entry" @key="entry.Id">
                                     <div class="small text-muted">@entry.Timestamp.ToString("HH:mm:ss")</div>
@@ -323,6 +331,11 @@ else
         AddActivityLog($"Comment updated for '{SelectedTask.Title}'");
     }
 
+
+    private static bool IsTaskRequired(str_test_demo_blazor.Domain.TestTaskRun task, str_test_demo_blazor.Domain.TestTemplate? template)
+    {
+        return template?.TestTasks.FirstOrDefault(templateTask => templateTask.Id == task.TaskTemplateId)?.RequiresPhoto ?? false;
+    }
     private static string GetRunStatusLabel(str_test_demo_blazor.Domain.TestRun run)
     {
         if (run.Status == str_test_demo_blazor.Domain.TestRunStatus.NotStarted)

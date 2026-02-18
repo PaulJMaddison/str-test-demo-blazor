@@ -20,7 +20,7 @@ main {
     min-height: 4.5rem;
     background-color: rgba(255, 255, 255, 0.94);
     backdrop-filter: blur(6px);
-    border-bottom: 1px solid #d5dfed;
+    border-bottom: 1px solid var(--str-border);
     display: flex;
     align-items: center;
     justify-content: space-between;
@@ -63,6 +63,7 @@ main {
 .content-container {
     max-width: 1280px;
     margin: 0 auto;
+    width: 100%;
 }
 
 @media (max-width: 640.98px) {
@@ -78,7 +79,7 @@ main {
     }
 
     .sidebar {
-        width: 260px;
+        width: 272px;
         height: 100vh;
         position: sticky;
         top: 0;
