@@ -15,7 +15,7 @@ Rationale:
 - Aligns with planned backend-driven STR automation and reporting
 
 The MVP runs on an in-memory service layer and is intentionally
-decoupled from the CSAM data model to allow rapid iteration of the
+decoupled from the data models to allow rapid iteration of the
 technician workflow prior to integration.
 
 ## Prerequisites

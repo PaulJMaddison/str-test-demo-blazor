@@ -81,18 +81,84 @@
                 </li>
             }
         </ul>
+        <h2 class="h5">Recent Tests</h2>
+        <div class="table-responsive">
+            <table class="table table-striped align-middle mb-0">
+                <thead>
+                    <tr>
+                        <th>Test ID</th>
+                        <th>Asset</th>
+                        <th>Status</th>
+                        <th>Technician</th>
+                        <th>Completed At</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var test in RecentTests)
+                    {
+                        var asset = DemoData.FindAsset(test.AssetId);
+                        var statusLabel = GetStatusLabel(test);
+
+                        <tr>
+                            <td>
+                                @if (test.Status == str_test_demo_blazor.Domain.TestRunStatus.Completed)
+                                {
+                                    <a href="@($"/certificate/{test.Id}")">@test.Id</a>
+                                }
+                                else
+                                {
+                                    @test.Id
+                                }
+                            </td>
+                            <td>@asset?.AssetTag</td>
+                            <td>
+                                <span class="status-pill @GetStatusPillClass(statusLabel)">@statusLabel</span>
+                            </td>
+                            <td>@test.TechnicianName</td>
+                            <td>@(test.CompletedAt?.ToString("yyyy-MM-dd HH:mm") ?? "In progress")</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
     </div>
 </section>
 
 @code {
     private int TestsToday => DemoData.TestRuns.Count(run => run.StartedAt.Date == DateTime.Today);
     private int OpenTests => DemoData.TestRuns.Count(run => run.Status != str_test_demo_blazor.Domain.TestRunStatus.Completed);
-    private int Overdue => DemoData.TestRuns.Count(run =>
-        run.Status != str_test_demo_blazor.Domain.TestRunStatus.Completed
-        && run.StartedAt < DateTime.Now.AddHours(-4));
+    private int Overdue => DemoData.TestRuns.Count(IsOverdue);
 
     private string AverageCompletionTimeDisplay => "2h 15m";
 
     private IEnumerable<str_test_demo_blazor.Domain.TestRun> RecentTests =>
         DemoData.TestRuns.OrderByDescending(run => run.StartedAt).Take(10);
+
+    private static bool IsOverdue(str_test_demo_blazor.Domain.TestRun run) =>
+        run.Status != str_test_demo_blazor.Domain.TestRunStatus.Completed
+        && run.StartedAt < DateTime.Now.AddHours(-4);
+
+    private static string GetStatusLabel(str_test_demo_blazor.Domain.TestRun run)
+    {
+        if (IsOverdue(run))
+        {
+            return "Overdue";
+        }
+
+        return run.Status switch
+        {
+            str_test_demo_blazor.Domain.TestRunStatus.NotStarted => "Open",
+            str_test_demo_blazor.Domain.TestRunStatus.InProgress => "In Progress",
+            str_test_demo_blazor.Domain.TestRunStatus.Completed => "Completed",
+            _ => "Open"
+        };
+    }
+
+    private static string GetStatusPillClass(string statusLabel) => statusLabel switch
+    {
+        "In Progress" => "status-pill-in-progress",
+        "Completed" => "status-pill-completed",
+        "Overdue" => "status-pill-overdue",
+        _ => "status-pill-open"
+    };
 }

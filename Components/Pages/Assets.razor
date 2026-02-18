@@ -34,7 +34,7 @@
                             <td>@asset.Serial</td>
                             <td>@asset.Type</td>
                             <td>@asset.Location</td>
-                            <td>@asset.Status</td>
+                            <td><span class="status-pill @GetAssetStatusPillClass(asset.Status)">@asset.Status</span></td>
                         </tr>
                     }
                 </tbody>
@@ -55,4 +55,15 @@
         || Contains(asset.Status));
 
     private bool Contains(string value) => value.Contains(SearchTerm, StringComparison.OrdinalIgnoreCase);
+
+    private static string GetAssetStatusPillClass(string status)
+    {
+        return status.ToLowerInvariant() switch
+        {
+            "active" => "status-pill-completed",
+            "maintenance" => "status-pill-in-progress",
+            "calibration due" => "status-pill-overdue",
+            _ => "status-pill-open"
+        };
+    }
 }
