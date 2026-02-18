@@ -13,7 +13,7 @@
 
 @if (CurrentRun is null)
 {
-    <section class="card shadow-sm mb-4">
+    <section class="card str-card mb-4">
         <div class="card-body">
             <h2 class="h5">Start Test</h2>
             <div class="row g-3">
@@ -47,7 +47,7 @@ else
     var asset = DemoData.FindAsset(CurrentRun.AssetId);
     var template = DemoData.FindTemplate(CurrentRun.TemplateId);
 
-    <section class="card shadow-sm mb-4">
+    <section class="card str-card mb-4">
         <div class="card-body d-flex flex-wrap justify-content-between gap-3 align-items-start">
             <div>
                 <h2 class="h5 mb-3">Test Run Details</h2>
@@ -88,7 +88,7 @@ else
 
     <section class="row g-3 align-items-stretch">
         <div class="col-12 col-lg-3">
-            <div class="card shadow-sm h-100">
+            <div class="card str-card h-100">
                 <div class="card-body">
                     <h2 class="h5">Tasks</h2>
                     <div class="list-group">
@@ -108,7 +108,7 @@ else
         </div>
 
         <div class="col-12 col-lg-5">
-            <div class="card shadow-sm h-100">
+            <div class="card str-card h-100">
                 <div class="card-body">
                     @if (SelectedTask is null)
                     {
@@ -177,7 +177,7 @@ else
         </div>
 
         <div class="col-12 col-lg-4">
-            <div class="card shadow-sm h-100">
+            <div class="card str-card h-100">
                 <div class="card-body">
                     <h2 class="h5">Activity Log</h2>
                     @if (_activityLog.Count == 0)
