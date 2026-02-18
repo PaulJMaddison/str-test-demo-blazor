@@ -57,29 +57,29 @@ else
 
             <section class="mb-4">
                 <h3 class="h6 text-uppercase text-muted">Summary</h3>
-                <div class="row g-3">
+                <div class="row g-3 summary-grid" aria-label="Certificate summary metrics">
                     <div class="col-6 col-md-3">
-                        <div class="summary-card border rounded p-3 text-center">
-                            <p class="small text-muted mb-1">Pass Count</p>
-                            <p class="h4 mb-0">@PassCount</p>
+                        <div class="summary-card summary-card-pass">
+                            <p class="summary-card-label mb-2">Pass Count</p>
+                            <p class="summary-card-value mb-0">@PassCount</p>
                         </div>
                     </div>
                     <div class="col-6 col-md-3">
-                        <div class="summary-card border rounded p-3 text-center">
-                            <p class="small text-muted mb-1">Fail Count</p>
-                            <p class="h4 mb-0">@FailCount</p>
+                        <div class="summary-card summary-card-fail">
+                            <p class="summary-card-label mb-2">Fail Count</p>
+                            <p class="summary-card-value mb-0">@FailCount</p>
                         </div>
                     </div>
                     <div class="col-6 col-md-3">
-                        <div class="summary-card border rounded p-3 text-center">
-                            <p class="small text-muted mb-1">N/A Count</p>
-                            <p class="h4 mb-0">@NaCount</p>
+                        <div class="summary-card summary-card-neutral">
+                            <p class="summary-card-label mb-2">N/A Count</p>
+                            <p class="summary-card-value mb-0">@NaCount</p>
                         </div>
                     </div>
                     <div class="col-6 col-md-3">
-                        <div class="summary-card border rounded p-3 text-center">
-                            <p class="small text-muted mb-1">Total Minutes</p>
-                            <p class="h4 mb-0">@(_testRun.TotalMinutes)</p>
+                        <div class="summary-card summary-card-time">
+                            <p class="summary-card-label mb-2">Total Minutes</p>
+                            <p class="summary-card-value mb-0">@(_testRun.TotalMinutes)</p>
                         </div>
                     </div>
                 </div>
