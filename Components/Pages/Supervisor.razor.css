@@ -213,3 +213,14 @@
         width: 150px;
     }
 }
+
+.supervisor-filters {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 1rem;
+    align-items: end;
+}
+
+.supervisor-panel h2 {
+    margin-bottom: 1rem;
+}

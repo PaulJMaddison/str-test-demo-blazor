@@ -128,3 +128,13 @@
     margin-top: 0.75rem;
     font-weight: 600;
 }
+
+.recent-test-item + .recent-test-item {
+    border-top: 1px solid #e4eaf5;
+    padding-top: 0.7rem;
+}
+
+.recent-tests .table td,
+.recent-tests .table th {
+    white-space: nowrap;
+}

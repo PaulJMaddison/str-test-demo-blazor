@@ -18,6 +18,39 @@
     }
 </section>
 
+
+<section class="card str-card mb-4" aria-label="Supervisor filters">
+    <div class="card-body supervisor-filters">
+        <div>
+            <label class="form-label" for="time-window">Time Window</label>
+            <select id="time-window" class="form-select" @bind="SelectedWindow">
+                <option>7 days</option>
+                <option>30 days</option>
+                <option>90 days</option>
+            </select>
+        </div>
+        <div>
+            <label class="form-label" for="supervisor-region">Region</label>
+            <select id="supervisor-region" class="form-select" @bind="SelectedRegion">
+                <option>All Regions</option>
+                <option>North</option>
+                <option>South</option>
+                <option>East</option>
+                <option>West</option>
+            </select>
+        </div>
+        <div>
+            <label class="form-label" for="owner-filter">Owner</label>
+            <select id="owner-filter" class="form-select" @bind="SelectedOwner">
+                <option>All Owners</option>
+                <option>Field Team A</option>
+                <option>Field Team B</option>
+                <option>Contractor</option>
+            </select>
+        </div>
+    </div>
+</section>
+
 <section class="supervisor-chart-grid mb-4" aria-label="Regional and outcome charts">
     <article class="card str-card supervisor-panel" aria-labelledby="region-chart-title">
         <div class="card-body">
@@ -72,6 +105,10 @@
 </section>
 
 @code {
+    private string SelectedWindow { get; set; } = "30 days";
+    private string SelectedRegion { get; set; } = "All Regions";
+    private string SelectedOwner { get; set; } = "All Owners";
+
     private static readonly IReadOnlyList<KpiMetric> KpiCards =
     [
         new("Tests This Month", "152", "metric-card--today", "demo-images/icon-clipboard.svg"),

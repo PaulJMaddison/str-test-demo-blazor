@@ -25,6 +25,14 @@
 
 .run-test-header__right {
     min-width: 280px;
+    border: 1px solid #d5deee;
+    border-radius: 12px;
+    padding: 0.85rem;
+    background: #f6f9ff;
+}
+
+.complete-test-btn {
+    min-width: 8.5rem;
 }
 
 .run-test-header__strip {
@@ -42,28 +50,72 @@
     border-left: 0.4rem solid #198754;
 }
 
-.photo-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
-    gap: 0.65rem;
+.task-list .list-group-item {
+    border-radius: 10px;
+    margin-bottom: 0.45rem;
+    border: 1px solid #d8e2f1;
 }
 
-@media (max-width: 767.98px) {
-    .run-test-header__right {
-        width: 100%;
-    }
+.task-list .list-group-item.active {
+    background: #edf4ff;
+    color: #102640;
+    border-color: #9dbcf0;
+}
 
-    .run-test-header__right .d-flex {
-        justify-content: flex-start !important;
-    }
+.task-title-wrap {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.28rem;
+}
+
+.task-result-chip {
+    font-size: 0.8rem;
+    font-weight: 700;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.38rem;
+}
+
+.task-complete-dot {
+    width: 0.6rem;
+    height: 0.6rem;
+    border-radius: 999px;
+    background: #b9c6da;
+}
+
+.task-complete-dot--done {
+    background: #1f8f52;
+}
+
+.result-segmented {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 0.5rem;
+}
+
+.result-btn {
+    min-height: 52px;
+}
+
+.photo-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(110px, 1fr));
+    gap: 0.7rem;
 }
 
 .photo-thumb {
     display: block;
     border: 1px solid #dee2e6;
-    border-radius: 0.5rem;
+    border-radius: 0.65rem;
     overflow: hidden;
     background-color: #f8f9fa;
+    transition: transform 120ms ease, box-shadow 150ms ease;
+}
+
+.photo-thumb:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 14px rgba(27, 42, 72, 0.16);
 }
 
 .photo-thumb img {
@@ -83,10 +135,10 @@
 }
 
 .activity-entry {
-    border: 1px solid #dee2e6;
+    border: 1px solid #e1e8f3;
     border-radius: 0.5rem;
     padding: 0.6rem 0.75rem;
-    background-color: #fff;
+    background-color: #fbfdff;
     animation: entry-in 260ms ease-out;
 }
 
@@ -99,5 +151,15 @@
     to {
         opacity: 1;
         transform: translateY(0);
+    }
+}
+
+@media (max-width: 767.98px) {
+    .run-test-header__right {
+        width: 100%;
+    }
+
+    .run-test-header__right .d-flex {
+        justify-content: flex-start !important;
     }
 }
